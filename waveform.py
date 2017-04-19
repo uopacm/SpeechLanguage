@@ -22,11 +22,4 @@ def generatePng(filename):
 	plt.title('Signal wave..')
 	plt.plot(Time,signal)
 	
-	setMarkers(1, 5) # For testing
 	plt.savefig('test.png')
-
-# Set line markers for left and right side
-def setMarkers(start, end):
-    y_min, y_max = plt.ylim()
-    plt.plot((start, start),(y_max+1, y_min-1), 'k')
-    plt.plot((end, end), (y_max + 1, y_min - 1), 'k')
