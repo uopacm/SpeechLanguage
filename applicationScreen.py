@@ -1,6 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
+from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QLabel,QSizePolicy, QGridLayout
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import *
 
 # Skeleton source from online
 class App(QMainWindow):
@@ -10,6 +11,7 @@ class App(QMainWindow):
         self.initUI()
 
     def initUI(self):
+
         exitAction = QAction(QIcon('exit.png'), '&Exit', self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Exit application')
@@ -21,8 +23,18 @@ class App(QMainWindow):
         fileMenu = menubar.addMenu('&File')
         fileMenu.addAction(exitAction)
 
-        self.setGeometry(300, 300, 300, 200)
+        self.setGeometry(500, 300, 500, 500)
         self.setWindowTitle('Main Menu')
+
+        self.label = QLabel("hello!", self)
+        self.label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setStyleSheet("QLabel {background-color: black; color : white}")
+
+        self.layout = QGridLayout()
+        self.layout.addWidget(self.label)
+        self.label.move(150, 150)
+
         self.show()
 
 
