@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import wave
 import sys
+import tempfile
 
 def generatePng(filename):
 	spf = wave.open(filename, 'r')
@@ -22,4 +23,13 @@ def generatePng(filename):
 	plt.title('Signal wave..')
 	plt.plot(Time,signal)
 	
-	plt.savefig('test.png')
+	#plt.savefig('test.png')
+	
+	temp = tempfile.NamedTemporaryFile()
+	try:
+		plt.savefig(temp.name)
+	
+	return temp
+
+'''if __name__ == '__main__':
+	generatePng('test.wav')'''
