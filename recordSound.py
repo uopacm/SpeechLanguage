@@ -17,9 +17,9 @@ class AudioRecorder:
         self.audio_buffer = []
         self.recording_thread = {}
         
-#    def __del__(self):
-#        self.stream.close()
-#        self.audio.terminate()
+    def __del__(self):
+        self.stream.close()
+        self.audio.terminate()
                 
     def recordAudio(self):
         while(self.is_recording):
