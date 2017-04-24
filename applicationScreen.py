@@ -1,9 +1,10 @@
 import sys
 from PyQt5 import QtGui
 
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout
+from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import *
+
 import random
 
 from recordSound import AudioRecorder
@@ -55,17 +56,21 @@ class App(QMainWindow):
         # Not quite sure about the differences between all the layout options....
         self.layout = QGridLayout()
 
+        self.scroll_area = QScrollArea(self)
+        
         # Widgets used for application
         self.spacePressed = QLabel("Record on.", self)
+
         self.spaceNotPressed = QLabel("Record off.", self)
         self.phrase = QLabel(self)
+        self.title = QLabel(self)
         self.font = QtGui.QFont()
 
         # Add widgets to layout
-        self.layout.addWidget(self.phrase)
-        self.layout.addWidget(self.spacePressed)
-        self.layout.addWidget(self.spaceNotPressed)
-
+        self.layout.addWidget(self.title)
+        self.scroll_area.setWidget(self.phrase)
+        self.layout.addWidget(self.scroll_area)
+        
         # Hide all widgets for now
         self.phrase.hide()
         self.spacePressed.hide()
@@ -81,20 +86,31 @@ class App(QMainWindow):
         self.content = setup_study(subject_info)
         self.next_page()
         self.showPhrases()
+        self.showTitle()
 
+    def showLabel(self, label):
+        # Edit phrase
+        self.font.setPointSize(12)
+        label.setWordWrap(True)
+        label.setFont(self.font)
+        label.setAlignment(Qt.AlignCenter)
+        label.adjustSize()
+        self.spacePressed.move(self.width()/2, self.height()/2)
+                              
+    def showTitle(self):
+        self.showLabel(self.title)
+        self.title.move(self.width()/4, self.height()/4)
+        self.title.show()
+        
     def showPhrases(self):
         # Read in first paragraph of phrases.txt
         # text = open('phrases.txt').read().splitlines()
         # line = random.choice(text) # Choose random line
-
-        # Edit phrase
-        self.font.setPointSize(12)
-        self.phrase.setWordWrap(True)
-        self.phrase.setFont(self.font)
-        self.phrase.setAlignment(Qt.AlignCenter)
-        self.phrase.adjustSize()
-        self.phrase.move(self.width()/4, self.height()/4)
-
+        self.showLabel(self.phrase)
+        self.phrase.move(self.width()/4, self.height()/2)
+        self.scroll_area.adjustSize()
+        self.scroll_area.move(self.width()/4, self.height()/2)
+        self.scroll_area.setWidgetResizable(True)
         self.phrase.show()
 
     def next_page(self):
@@ -104,27 +120,24 @@ class App(QMainWindow):
             # Exit the program
             pass
         elif(type(self.current_page) is TextWindow):
+            self.title.show()
+            self.title.setText(self.current_page.header)
             self.phrase.setText(self.current_page.text)
         elif(type(self.current_page) is BaseRecording):
+            self.title.hide()
             self.phrase.setText(self.current_page.text)
         
     def base_recording_window_spacebar(self, event):
         if event.key() == Qt.Key_Space and self.isRecording == False:
-            self.spaceNotPressed.hide()
-            self.spacePressed.move(self.width() / 4, self.height() - 200)
-            self.spacePressed.setFont(self.font)
-            self.spacePressed.adjustSize()
-            self.spacePressed.show()
             self.isRecording = True
             self.audio_recorder.start_recording("test.wav")
+            self.title.setText("Recording on.")
+            self.title.show()
         elif (event.key() == Qt.Key_Space and self.isRecording):
-            self.spacePressed.hide()
-            self.spaceNotPressed.move(self.width() / 2, self.height() - 200)
-            self.spaceNotPressed.setFont(self.font)
-            self.spaceNotPressed.adjustSize()
-            self.spaceNotPressed.show()
             self.isRecording = False
             self.audio_recorder.stop_recording()
+            self.title.setText("Recording off.")
+            self.title.show()
         
     def keyPressEvent(self, event):
 
