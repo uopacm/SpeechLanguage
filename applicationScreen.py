@@ -8,6 +8,11 @@ import random
 
 from recordSound import AudioRecorder
 
+import queue
+from study import *
+
+
+
 # Skeleton source from online
 class App(QMainWindow):
     def __init__(self):
@@ -20,8 +25,15 @@ class App(QMainWindow):
 
         self.initUI()
 
+        # Setup everything for audio recording
         self.audio_recorder = AudioRecorder()
 
+        # Holds a Queue of the different page contents
+        self.content = {}
+
+        # Holds the info for the current page
+        self.current_page = {}
+        
         # Have run() handle all methods
         self.run()
 
@@ -62,15 +74,20 @@ class App(QMainWindow):
         self.show()
 
     def run(self):
+
+        # Get subject id
+        # self.get_subect_info()
+        subject_info = "subejct1"
+        self.content = setup_study(subject_info)
+        self.next_page()
         self.showPhrases()
 
     def showPhrases(self):
         # Read in first paragraph of phrases.txt
-        text = open('phrases.txt').read().splitlines()
-        line = random.choice(text) # Choose random line
+        # text = open('phrases.txt').read().splitlines()
+        # line = random.choice(text) # Choose random line
 
         # Edit phrase
-        self.phrase.setText(line)
         self.font.setPointSize(12)
         self.phrase.setWordWrap(True)
         self.phrase.setFont(self.font)
@@ -80,11 +97,18 @@ class App(QMainWindow):
 
         self.phrase.show()
 
-    def keyPressEvent(self, event):
+    def next_page(self):
+        self.current_page = self.content.pop(0)
 
-        # TODO: WILL CHANGE ACTIONS LATER!!!
-        # Temporary actions to show spacebar workes for now.
-
+        if(self.current_page is None):
+            # Exit the program
+            pass
+        elif(type(self.current_page) is TextWindow):
+            self.phrase.setText(self.current_page.text)
+        elif(type(self.current_page) is BaseRecording):
+            self.phrase.setText(self.current_page.text)
+        
+    def base_recording_window_spacebar(self, event):
         if event.key() == Qt.Key_Space and self.isRecording == False:
             self.spaceNotPressed.hide()
             self.spacePressed.move(self.width() / 4, self.height() - 200)
@@ -101,6 +125,15 @@ class App(QMainWindow):
             self.spaceNotPressed.show()
             self.isRecording = False
             self.audio_recorder.stop_recording()
+        
+    def keyPressEvent(self, event):
+
+        if (type(self.current_page) is TextWindow):
+            self.next_page()
+        elif(type(self.current_page) is BaseRecording):
+            self.base_recording_window_spacebar(event)
+
+
 
 
 if __name__ == '__main__':
