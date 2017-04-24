@@ -6,6 +6,8 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import *
 import random
 
+from recordSound import AudioRecorder
+
 # Skeleton source from online
 class App(QMainWindow):
     def __init__(self):
@@ -17,6 +19,8 @@ class App(QMainWindow):
         self.windowHeight = 500
 
         self.initUI()
+
+        self.audio_recorder = AudioRecorder()
 
         # Have run() handle all methods
         self.run()
@@ -88,6 +92,7 @@ class App(QMainWindow):
             self.spacePressed.adjustSize()
             self.spacePressed.show()
             self.isRecording = True
+            self.audio_recorder.start_recording("test.wav")
         elif (event.key() == Qt.Key_Space and self.isRecording):
             self.spacePressed.hide()
             self.spaceNotPressed.move(self.width() / 2, self.height() - 200)
@@ -95,6 +100,7 @@ class App(QMainWindow):
             self.spaceNotPressed.adjustSize()
             self.spaceNotPressed.show()
             self.isRecording = False
+            self.audio_recorder.stop_recording()
 
 
 if __name__ == '__main__':
