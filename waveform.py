@@ -19,7 +19,7 @@ def generatePng(filename):
 	# Timing is extended.... test with more
         Time = np.linspace(0, len(signal)/fs, num=len(signal))
         plt.figure(1)
-        plt.title('Signal wave..')
+        plt.title(filename)
         plt.tick_params(axis='y', which='both', left='off',labelleft='off')
         plt.plot(Time,signal)
         plt.savefig(filename + '.png')

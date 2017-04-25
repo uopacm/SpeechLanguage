@@ -2,15 +2,19 @@ import sys
 from PyQt5 import QtGui
 
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import *
 
 import random
 
 from recordSound import AudioRecorder
 
-import queue
 from study import *
+import waveform
+
+
+WAV_IMAGE_HEIGHT = 500
+WAV_IMAGE_WIDTH = 1000
 
 
 
@@ -18,11 +22,10 @@ from study import *
 class App(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.isRecording = False
         self.left = 500
         self.top = 300
-        self.windowWidth = 700
-        self.windowHeight = 500
+        self.windowWidth = 1720
+        self.windowHeight = 1000
 
         self.initUI()
 
@@ -31,6 +34,9 @@ class App(QMainWindow):
 
         # Holds a Queue of the different page contents
         self.content = {}
+
+        # Sequences the actions for the space bar
+        self.spacebar_actions = []
 
         # Holds the info for the current page
         self.current_page = {}
@@ -59,22 +65,23 @@ class App(QMainWindow):
         self.scroll_area = QScrollArea(self)
         
         # Widgets used for application
-        self.spacePressed = QLabel("Record on.", self)
-
-        self.spaceNotPressed = QLabel("Record off.", self)
         self.phrase = QLabel(self)
         self.title = QLabel(self)
         self.font = QtGui.QFont()
+
+        # Image for the wav form trimming
+        self.wav_image = QLabel(self)
+        self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
 
         # Add widgets to layout
         self.layout.addWidget(self.title)
         self.scroll_area.setWidget(self.phrase)
         self.layout.addWidget(self.scroll_area)
+        self.layout.addWidget(self.wav_image)
         
         # Hide all widgets for now
         self.phrase.hide()
-        self.spacePressed.hide()
-        self.spaceNotPressed.hide()
+        self.wav_image.hide()
 
         self.show()
 
@@ -95,7 +102,7 @@ class App(QMainWindow):
         label.setFont(self.font)
         label.setAlignment(Qt.AlignCenter)
         label.adjustSize()
-        self.spacePressed.move(self.width()/2, self.height()/2)
+
                               
     def showTitle(self):
         self.showLabel(self.title)
@@ -113,38 +120,53 @@ class App(QMainWindow):
         self.scroll_area.setWidgetResizable(True)
         self.phrase.show()
 
+    
+    def recording_on(self):
+            self.audio_recorder.start_recording(self.current_page.output_file)
+            self.title.setText("Recording on.")
+            self.title.show()
+
+    def recording_off(self):
+            self.audio_recorder.stop_recording()
+            self.title.setText("Recording off.")
+            self.title.show()        
+
     def next_page(self):
+        self.spacebar_actions = []
         self.current_page = self.content.pop(0)
 
         if(self.current_page is None):
             # Exit the program
             pass
+
+        # ------ Setup a Text  Window Page --------
         elif(type(self.current_page) is TextWindow):
             self.title.show()
             self.title.setText(self.current_page.header)
             self.phrase.setText(self.current_page.text)
+
+        # ------ Setup a Base Recording Page ---------
         elif(type(self.current_page) is BaseRecording):
             self.title.hide()
             self.phrase.setText(self.current_page.text)
-        
-    def base_recording_window_spacebar(self, event):
-        if event.key() == Qt.Key_Space and self.isRecording == False:
-            self.isRecording = True
-            self.audio_recorder.start_recording("test.wav")
-            self.title.setText("Recording on.")
-            self.title.show()
-        elif (event.key() == Qt.Key_Space and self.isRecording):
-            self.isRecording = False
-            self.audio_recorder.stop_recording()
-            self.title.setText("Recording off.")
-            self.title.show()
-        
-    def keyPressEvent(self, event):
 
-        if (type(self.current_page) is TextWindow):
+            # Spacebar actions for Base Recording
+            self.spacebar_actions.append(self.recording_on)
+            self.spacebar_actions.append(self.recording_off)
+            
+        elif(type(self.current_page) is TrimAudio):
+            waveform.generatePng(self.current_page.wav_file)
+            image = QPixmap(self.current_page.wav_file + '.png')
+            self.wav_image.setPixmap(image.scaled(WAV_IMAGE_WIDTH, WAV_IMAGE_HEIGHT))
+            self.wav_image.show()
+                
+            
+    def keyPressEvent(self, event):
+        if not self.spacebar_actions:
             self.next_page()
-        elif(type(self.current_page) is BaseRecording):
-            self.base_recording_window_spacebar(event)
+        else:
+            action = self.spacebar_actions.pop(0)
+            action()
 
 
 
