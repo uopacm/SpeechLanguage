@@ -12,6 +12,7 @@ from recordSound import AudioRecorder
 from study import *
 import waveform
 
+from QRoundProgressBar import *
 
 WAV_IMAGE_HEIGHT = 500
 WAV_IMAGE_WIDTH = 1000
@@ -61,13 +62,13 @@ class App(QMainWindow):
 
         # Not quite sure about the differences between all the layout options....
         self.layout = QGridLayout()
-
         self.scroll_area = QScrollArea(self)
         
         # Widgets used for application
         self.phrase = QLabel(self)
         self.title = QLabel(self)
         self.font = QtGui.QFont()
+        self.pacman = QRoundProgressBar()
 
         # Image for the wav form trimming
         self.wav_image = QLabel(self)
@@ -78,12 +79,14 @@ class App(QMainWindow):
         self.scroll_area.setWidget(self.phrase)
         self.layout.addWidget(self.scroll_area)
         self.layout.addWidget(self.wav_image)
+        self.layout.addWidget(self.pacman)
         
         # Hide all widgets for now
         self.phrase.hide()
         self.wav_image.hide()
 
         self.show()
+        self.pacman.show()
 
     def run(self):
 
