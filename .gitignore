@@ -10,6 +10,10 @@ __pycache__/
 *.png
 *.wav
 
+# Thumbnails
+.DS_Store
+._.DS_Store
+
 # Distribution / packaging
 .Python
 env/

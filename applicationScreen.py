@@ -171,9 +171,6 @@ class App(QMainWindow):
             action = self.spacebar_actions.pop(0)
             action()
 
-
-
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
