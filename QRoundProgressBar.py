@@ -5,6 +5,8 @@ from PyQt5.QtCore import *
 
 class QRoundProgressBar(QWidget):
 
+    ALPHA = 0
+    
     StyleDonut = 1
     StylePie = 2
     StyleLine = 3
@@ -126,9 +128,6 @@ class QRoundProgressBar(QWidget):
         # data brush
         self.rebuildDataBrushIfNeeded()
 
-        # background
-        self.drawBackground(p, buffer.rect())
-
         # base circle
         self.drawBase(p, baseRect)
 
@@ -136,12 +135,6 @@ class QRoundProgressBar(QWidget):
         arcStep = 360.0 / (self.max - self.min) * self.value
         self.drawValue(p, baseRect, self.value, arcStep)
 
-        # center circle
-        innerRect, innerRadius = self.calculateInnerRect(baseRect, outerRadius)
-        self.drawInnerBackground(p, innerRect)
-
-        # text
-        self.drawText(p, innerRect, innerRadius, self.value)
 
         # finally draw the bar
         p.end()
@@ -149,36 +142,15 @@ class QRoundProgressBar(QWidget):
         painter = QtGui.QPainter(self)
         painter.drawImage(0, 0, buffer)
 
-    def drawBackground(self, p, baseRect):
-        p.fillRect(baseRect, Qt.white)
-
     def drawBase(self, p, baseRect):
-        bs = self.barStyle
-        if bs == self.StyleDonut:
-            p.setPen(QtGui.QPen(self.palette().shadow().color(), self.outlinePenWidth))
-            p.setBrush(self.palette().base())
-            p.drawEllipse(baseRect)
-        elif bs == self.StylePie:
-            p.setPen(QtGui.QPen(self.palette().base().color(), self.outlinePenWidth))
-            p.setBrush(self.palette().base())
-            p.drawEllipse(baseRect)
-        elif bs == self.StyleLine:
-            p.setPen(QtGui.QPen(self.palette().base().color(), self.outlinePenWidth))
-            p.setBrush(Qt.Qt.NoBrush)
-            p.drawEllipse(baseRect.adjusted(self.outlinePenWidth/2, self.outlinePenWidth/2, -self.outlinePenWidth/2, -self.outlinePenWidth/2))
+        p.setPen(QtGui.QPen(self.palette().base().color(), self.outlinePenWidth))
+        p.setBrush(self.palette().base())
+        p.drawEllipse(baseRect)
+
 
     def drawValue(self, p, baseRect, value, arcLength):
         # nothing to draw
         if value == self.min:
-            return
-
-        # for Line style
-        if self.barStyle == self.StyleLine:
-            p.setPen(QtGui.QPen(self.palette().highlight().color(), self.dataPenWidth))
-            p.setBrush(Qt.Qt.NoBrush)
-            p.drawArc(baseRect.adjusted(self.outlinePenWidth/2, self.outlinePenWidth/2, -self.outlinePenWidth/2, -self.outlinePenWidth/2),
-                      self.nullPosition * 16,
-                      -arcLength * 16)
             return
 
         # for Pie and Donut styles
@@ -195,42 +167,11 @@ class QRoundProgressBar(QWidget):
         p.drawPath(dataPath)
 
     def calculateInnerRect(self, baseRect, outerRadius):
-        # for Line style
-        if self.barStyle == self.StyleLine:
-            innerRadius = outerRadius - self.outlinePenWidth
-        else:    # for Pie and Donut styles
-            innerRadius = outerRadius * self.donutThicknessRatio
+        innerRadius = outerRadius * self.donutThicknessRatio
 
         delta = (outerRadius - innerRadius) / 2.
         innerRect = QtCore.QRectF(delta, delta, innerRadius, innerRadius)
         return innerRect, innerRadius
-
-    def drawInnerBackground(self, p, innerRect):
-        if self.barStyle == self.StyleDonut:
-            p.setBrush(self.palette().alternateBase())
-
-            cmod = p.compositionMode()
-            p.setCompositionMode(QtGui.QPainter.CompositionMode_Source)
-
-            p.drawEllipse(innerRect)
-
-            p.setCompositionMode(cmod)
-
-    def drawText(self, p, innerRect, innerRadius, value):
-        if not self.format:
-            return
-
-        text = self.valueToText(value)
-
-        # !!! to revise
-        f = self.font()
-        # f.setPixelSize(innerRadius * max(0.05, (0.35 - self.decimals * 0.08)))
-        f.setPixelSize(innerRadius * 1.8 / len(text))
-        p.setFont(f)
-
-        textRect = innerRect
-        p.setPen(self.palette().text().color())
-        p.drawText(textRect, Qt.AlignCenter, text)
 
     def valueToText(self, value):
         textToDraw = self.format

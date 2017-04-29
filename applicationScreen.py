@@ -63,13 +63,23 @@ class App(QMainWindow):
         # Not quite sure about the differences between all the layout options....
         self.layout = QGridLayout()
         self.scroll_area = QScrollArea(self)
+
+        # Pacman Progress Bar
+        self.pacman = QRoundProgressBar(self)
+        self.pacman.setBarStyle(2) # Pie
+        self.pacman.setFixedWidth(200)
+        self.pacman.setFixedHeight(200)
+        self.center(self.pacman)
+        self.pacman.lower()
+        self.pacman.setWindowOpacity(0.9)
+        self.layout.addWidget(self.pacman)
+        self.pacman.show()
         
         # Widgets used for application
         self.phrase = QLabel(self)
         self.title = QLabel(self)
         self.font = QtGui.QFont()
-        self.pacman = QRoundProgressBar(self)
-
+        
         # Image for the wav form trimming
         self.wav_image = QLabel(self)
         self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
@@ -79,14 +89,13 @@ class App(QMainWindow):
         self.scroll_area.setWidget(self.phrase)
         self.layout.addWidget(self.scroll_area)
         self.layout.addWidget(self.wav_image)
-        self.layout.addWidget(self.pacman)
+
         
         # Hide all widgets for now
         self.phrase.hide()
         self.wav_image.hide()
-
         self.show()
-        self.pacman.show()
+        
 
     def run(self):
 
@@ -111,6 +120,9 @@ class App(QMainWindow):
         self.showLabel(self.title)
         self.title.move(self.width()/4, self.height()/4)
         self.title.show()
+
+    def center(self, w):
+        w.move(self.width()/4, self.height()/4)
         
     def showPhrases(self):
         # Read in first paragraph of phrases.txt
@@ -122,7 +134,6 @@ class App(QMainWindow):
         self.scroll_area.move(self.width()/4, self.height()/2)
         self.scroll_area.setWidgetResizable(True)
         self.phrase.show()
-
     
     def recording_on(self):
             self.audio_recorder.start_recording(self.current_page.output_file)
