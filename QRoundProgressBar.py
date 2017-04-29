@@ -6,6 +6,7 @@ from PyQt5.QtCore import *
 class QRoundProgressBar(QWidget):
 
     ALPHA = 0
+    FILL_COLOR = QtGui.QColor(30,144,255,25)
     
     StyleDonut = 1
     StylePie = 2
@@ -144,7 +145,9 @@ class QRoundProgressBar(QWidget):
 
     def drawBase(self, p, baseRect):
         p.setPen(QtGui.QPen(self.palette().base().color(), self.outlinePenWidth))
-        p.setBrush(self.palette().base())
+        b = self.palette().base()
+        b.setColor(QtGui.QColor(255,255,255,0))
+        p.setBrush(b)
         p.drawEllipse(baseRect)
 
 
@@ -162,8 +165,11 @@ class QRoundProgressBar(QWidget):
         dataPath.arcTo(baseRect, self.nullPosition, -arcLength)
         dataPath.lineTo(baseRect.center())
 
-        p.setBrush(self.palette().highlight())
-        p.setPen(QtGui.QPen(self.palette().shadow().color(), self.dataPenWidth))
+        # Set color for the filled portion
+        p.setBrush(QtGui.QBrush(self.FILL_COLOR))
+        
+        p.setPen(QtGui.QPen(QtGui.QColor(0,0,0,0), self.dataPenWidth))
+
         p.drawPath(dataPath)
 
     def calculateInnerRect(self, baseRect, outerRadius):
