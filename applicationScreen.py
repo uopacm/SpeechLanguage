@@ -68,7 +68,7 @@ class App(QMainWindow):
         self.phrase = QLabel(self)
         self.title = QLabel(self)
         self.font = QtGui.QFont()
-        self.pacman = QRoundProgressBar()
+        self.pacman = QRoundProgressBar(self)
 
         # Image for the wav form trimming
         self.wav_image = QLabel(self)

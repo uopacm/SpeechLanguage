@@ -13,7 +13,12 @@ class AudioRecorder:
         self.output = "sound.wav"
         self.is_recording = False
         self.audio = pyaudio.PyAudio()
-        self.stream = self.audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK, start=False)
+        
+        try:
+            self.stream = self.audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK, start=False)
+        except Exception:
+            print("No audio input device detected!")
+            
         self.audio_buffer = []
         self.recording_thread = {}
         

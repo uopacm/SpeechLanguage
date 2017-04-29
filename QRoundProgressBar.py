@@ -1,8 +1,9 @@
 from PyQt5 import QtWidgets, QtCore, QtGui, Qt
 
+from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import *
 
-class QRoundProgressBar(QtWidgets.QWidget):
+class QRoundProgressBar(QWidget):
 
     StyleDonut = 1
     StylePie = 2
@@ -17,8 +18,8 @@ class QRoundProgressBar(QtWidgets.QWidget):
     UF_PERCENT = 2
     UF_MAX = 4
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super(QRoundProgressBar, self).__init__(parent)
         self.min = 0
         self.max = 100
         self.value = 25
@@ -149,7 +150,6 @@ class QRoundProgressBar(QtWidgets.QWidget):
         painter.drawImage(0, 0, buffer)
 
     def drawBackground(self, p, baseRect):
-        print(dir(self.palette()))
         p.fillRect(baseRect, Qt.white)
 
     def drawBase(self, p, baseRect):
