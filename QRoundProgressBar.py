@@ -7,6 +7,7 @@ class QRoundProgressBar(QWidget):
 
     ALPHA = 0
     FILL_COLOR = QtGui.QColor(30,144,255,25)
+    BASE_COLOR = QtGui.QColor(255,255,255,0)
     
     StyleDonut = 1
     StylePie = 2
@@ -36,7 +37,6 @@ class QRoundProgressBar(QWidget):
         self.decimals = 1
         self.updateFlags = self.UF_PERCENT
         self.gradientData = []
-        self.donutThicknessRatio = 0.75
 
     def setRange(self, min, max):
         self.min = min
@@ -146,7 +146,7 @@ class QRoundProgressBar(QWidget):
     def drawBase(self, p, baseRect):
         p.setPen(QtGui.QPen(self.palette().base().color(), self.outlinePenWidth))
         b = self.palette().base()
-        b.setColor(QtGui.QColor(255,255,255,0))
+        b.setColor(self.BASE_COLOR)
         p.setBrush(b)
         p.drawEllipse(baseRect)
 
