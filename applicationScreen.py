@@ -57,6 +57,8 @@ class App(QMainWindow):
 
         # Holds the info for the current page
         self.current_page = {}
+
+        self.timer = QTimer()
         
         # Have run() handle all methods
         self.run()
@@ -152,6 +154,10 @@ class App(QMainWindow):
             self.title.setText("Recording off.")
             self.title.show()        
 
+    def timer_tick(self):
+        self.timed_text.pacman.setValue(self.timed_text.pacman.value + 1)
+        print('tick')
+            
     def next_page(self):
         self.spacebar_actions = []
         self.current_page = self.content.pop(0)
@@ -194,6 +200,8 @@ class App(QMainWindow):
             self.showLabel(self.timed_text.scroll_text)
             self.timed_text.show()
             self.scroll_area.show()
+            self.timer.timeout.connect(self.timer_tick)
+            self.timer.start(1000)
 
 
             # Spacebar actions for Base Recording
