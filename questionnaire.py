@@ -3,12 +3,11 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QWidget, QRadioButton, QButtonGroup
 from PyQt5.QtCore import QSize
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        QMainWindow.__init__(self)
+class Questionnaire(QWidget):
+    def __init__(self, parent):
+        super(Questionnaire, self).__init__(parent)
         self.layout = QGridLayout()
         self.setMinimumSize(QSize(500, 500))
-        self.setWindowTitle("Questionnaire")
 
         # Add instructions at top
         self.instructions = QLabel("Rate the following statements for HOW MUCH you experienced: \n(1 being lowest, 5 being highest)", self)
@@ -57,9 +56,3 @@ class MainWindow(QMainWindow):
             count += 1
 
         self.adjustCounter += 1  # Will adjust coordinates for next question
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    mainWin = MainWindow()
-    mainWin.show()
-    sys.exit(app.exec_())

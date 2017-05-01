@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtGui
 
-from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea
+from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import *
 from PyQt5 import Qt
@@ -15,6 +15,7 @@ import waveform
 
 from QRoundProgressBar import *
 from QTimedText import *
+from questionnaire import Questionnaire
 
 WAV_IMAGE_HEIGHT = 500
 WAV_IMAGE_WIDTH = 1000
@@ -56,7 +57,8 @@ class App(QMainWindow):
         self.spacebar_actions = []
 
         # Holds the info for the current page
-        self.current_page = {}
+        self.current_page = Intro()
+        self.spacebar_actions.append(self.intro_complete)
 
         self.timer = QTimer()
         
@@ -86,6 +88,8 @@ class App(QMainWindow):
         self.layout.addWidget(self.intro_screen)
         self.intro_screen.setFixedWidth(500)
         self.intro_screen.setFixedHeight(300)
+        self.intro_screen.move(self.width()/4, self.height()/4)
+        self.intro_screen.show()
         
         # Scroll Area
         self.scroll_area = QScrollArea(self)
@@ -95,20 +99,24 @@ class App(QMainWindow):
         self.scroll_area.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.scroll_area)
 
+        # Timed Text
         self.timed_text = QTimedText(self)
-        self.timed_text.setFixedHeight(500)
         self.timed_text.setFixedWidth(500)
-        self.timed_text.move(self.width() * 0.75, self.height() * 0.75)
+        self.timed_text.setFixedHeight(600)
+        self.timed_text.move(self.width() * 0.25, self.height() * 0.25)
         self.showLabel(self.timed_text.scroll_text)
-        self.scroll_area.setWidget(self.timed_text)
-        
+        self.layout.addWidget(self.timed_text)
+
+        # Normal Phrase
         self.phrase = QLabel(self)
         self.showLabel(self.phrase)
         self.phrase.move(self.width()/4, self.height()/4)
-        self.phrase.setFixedHeight(500)
-        self.phrase.setFixedWidth(500)
+#        self.phrase.setFixedHeight(500)
+#        self.phrase.setFixedWidth(500)
         self.layout.addWidget(self.phrase)
+        self.scroll_area.setWidget(self.phrase)
 
+        # Page Titles
         self.title = QLabel(self)
         self.title.move(self.width()/4, self.height()/8)
         self.title.setFixedHeight(100)
@@ -119,6 +127,23 @@ class App(QMainWindow):
         self.wav_image = QLabel(self)
         self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
         self.layout.addWidget(self.wav_image)
+
+        # Questionnaire
+        self.questionnaire = Questionnaire(self)
+        self.questionnaire.move(self.width()/4, self.height()/4)
+        self.layout.addWidget(self.questionnaire)
+
+        # Trim Audio Sliders
+        self.begin_slider = QSlider(Qt.Horizontal,self)
+        self.begin_slider.move(self.width() * 0.125, self.height() * 0.6)
+        self.begin_slider.setFixedWidth(750)
+        self.layout.addWidget(self.begin_slider)
+        
+        self.end_slider = QSlider(Qt.Horizontal, self)
+        self.end_slider.move(self.width() * 0.125, self.height() * 0.7)
+        self.end_slider.setFixedWidth(750)
+        self.layout.addWidget(self.end_slider)
+        
         
         self.show()
         
@@ -127,9 +152,8 @@ class App(QMainWindow):
 
         # Get subject id
         # self.get_subect_info()
-        subject_info = "subejct1"
-        self.content = setup_study(subject_info)
-        self.next_page()
+        self.hide_all()
+        self.intro_screen.show()
 
     def showLabel(self, label):
         # Edit phrase
@@ -140,6 +164,7 @@ class App(QMainWindow):
         label.adjustSize()
 
     def hide_all(self):
+        self.timed_text.hide()
         for i in range(self.layout.count()):
             self.layout.itemAt(i).widget().hide()
                               
@@ -156,7 +181,11 @@ class App(QMainWindow):
 
     def timer_tick(self):
         self.timed_text.pacman.setValue(self.timed_text.pacman.value + 1)
-        print('tick')
+
+    def intro_complete(self):
+        self.intro_screen.create_subject_id_and_folder()
+        self.content = setup_study(self.intro_screen.subject_id)
+        self.next_page()
             
     def next_page(self):
         self.spacebar_actions = []
@@ -168,11 +197,7 @@ class App(QMainWindow):
         
         if(self.current_page is None):
             # Exit the program
-            pass
-
-        if(type(self.current_page) is Intro):
-            self.intro_screen.show()
-            self.spacebar_actions.append(self.intro_screen.create_subject_id_and_folder)
+            pass            
         
         # ------ Setup a Text  Window Page --------
         elif(type(self.current_page) is TextWindow):
@@ -180,14 +205,17 @@ class App(QMainWindow):
             self.title.setText(self.current_page.header)
             self.phrase.show()
             self.phrase.setText(self.current_page.text)
+            self.phrase.adjustSize()
+            self.scroll_area.show()
 
         # ------ Setup a Base Recording Page ---------
         elif(type(self.current_page) is BaseRecording):
             self.title.show()
             self.title.setText('Press space to begin recording')
-            self.timed_text.show()
             self.scroll_area.show()
-
+            self.phrase.show()
+            self.phrase.setText(self.current_page.text)
+            self.phrase.adjustSize()
 
             # Spacebar actions for Base Recording
             self.spacebar_actions.append(self.recording_on)
@@ -199,7 +227,6 @@ class App(QMainWindow):
             self.timed_text.setText(self.current_page.text)
             self.showLabel(self.timed_text.scroll_text)
             self.timed_text.show()
-            self.scroll_area.show()
             self.timer.timeout.connect(self.timer_tick)
             self.timer.start(1000)
 
@@ -213,12 +240,15 @@ class App(QMainWindow):
             image = QPixmap(self.current_page.wav_file + '.png')
             self.wav_image.setPixmap(image.scaled(WAV_IMAGE_WIDTH, WAV_IMAGE_HEIGHT))
             self.wav_image.show()
+            self.begin_slider.show()
+            self.end_slider.show()
+
+        elif(type(self.current_page) is Survey):
+            self.questionnaire.show()
                 
             
     def keyPressEvent(self, event):
-        print(str(event.key()) + ' ' + str(Qt.Key_Space))
         if event.key() == Qt.Key_Space:
-            print("press")
             if not self.spacebar_actions:
                 self.next_page()
             else:
