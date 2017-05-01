@@ -14,6 +14,7 @@ from study import *
 import waveform
 
 from QRoundProgressBar import *
+from QTimedText import *
 
 WAV_IMAGE_HEIGHT = 500
 WAV_IMAGE_WIDTH = 1000
@@ -81,21 +82,8 @@ class App(QMainWindow):
         # IntroScreen
         self.intro_screen = IntroScreen(self)
         self.layout.addWidget(self.intro_screen)
-        self.center(self.intro_screen)
         self.intro_screen.setFixedWidth(500)
         self.intro_screen.setFixedHeight(300)
-        self.intro_screen.show()
-        
-        # Pacman Progress Bar
-        self.pacman = QRoundProgressBar(self)
-        self.pacman.setBarStyle(2) # Pie
-        self.pacman.setFixedWidth(200)
-        self.pacman.setFixedHeight(200)
-        self.center(self.pacman)
-        self.pacman.lower()
-        self.pacman.setWindowOpacity(0.9)
-        self.layout.addWidget(self.pacman)
-        self.pacman.hide()
         
         # Scroll Area
         self.scroll_area = QScrollArea(self)
@@ -104,15 +92,13 @@ class App(QMainWindow):
         self.scroll_area.setFixedHeight(500)
         self.scroll_area.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.scroll_area)
-        self.scroll_area.hide()
 
-        # Scrolling Text
-        self.scroll_text = QLabel(self)
-        self.showLabel(self.scroll_text)
-        self.layout.addWidget(self.scroll_text)
-        self.scroll_area.setWidget(self.scroll_text)
-        self.scroll_text.adjustSize()
-        self.scroll_text.hide()
+        self.timed_text = QTimedText(self)
+        self.timed_text.setFixedHeight(500)
+        self.timed_text.setFixedWidth(500)
+        self.timed_text.move(self.width() * 0.75, self.height() * 0.75)
+        self.showLabel(self.timed_text.scroll_text)
+        self.scroll_area.setWidget(self.timed_text)
         
         self.phrase = QLabel(self)
         self.showLabel(self.phrase)
@@ -120,22 +106,18 @@ class App(QMainWindow):
         self.phrase.setFixedHeight(500)
         self.phrase.setFixedWidth(500)
         self.layout.addWidget(self.phrase)
-        self.phrase.hide()
 
         self.title = QLabel(self)
         self.title.move(self.width()/4, self.height()/8)
         self.title.setFixedHeight(100)
         self.title.setFixedWidth(300)
         self.layout.addWidget(self.title)
-        self.title.hide()
         
         # Image for the wav form trimming
         self.wav_image = QLabel(self)
         self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
         self.layout.addWidget(self.wav_image)
-        self.wav_image.hide()
         
-        # Hide all widgets for now
         self.show()
         
 
@@ -155,14 +137,10 @@ class App(QMainWindow):
         label.setAlignment(Qt.AlignCenter)
         label.adjustSize()
 
+    def hide_all(self):
+        for i in range(self.layout.count()):
+            self.layout.itemAt(i).widget().hide()
                               
-    def showTitle(self):
-        self.showLabel(self.title)
-        self.title.move(self.width()/2, self.height()/2)
-        self.title.show()
-
-    def center(self, w):
-        w.move(self.width()/4, self.height()/4)
     
     def recording_on(self):
             self.audio_recorder.start_recording(self.current_page.output_file)
@@ -177,6 +155,10 @@ class App(QMainWindow):
     def next_page(self):
         self.spacebar_actions = []
         self.current_page = self.content.pop(0)
+
+        # Just hide everything so each page doesn't have
+        # to worry about what was already being dispalyed
+        self.hide_all()
         
         if(self.current_page is None):
             # Exit the program
@@ -184,13 +166,10 @@ class App(QMainWindow):
 
         if(type(self.current_page) is Intro):
             self.intro_screen.show()
-            self.title.hide()
-            self.phrase.hide()
             self.spacebar_actions.append(self.intro_screen.create_subject_id_and_folder)
         
         # ------ Setup a Text  Window Page --------
         elif(type(self.current_page) is TextWindow):
-            self.intro_screen.hide()
             self.title.show()
             self.title.setText(self.current_page.header)
             self.phrase.show()
@@ -198,12 +177,22 @@ class App(QMainWindow):
 
         # ------ Setup a Base Recording Page ---------
         elif(type(self.current_page) is BaseRecording):
-            self.phrase.hide()
             self.title.show()
             self.title.setText('Press space to begin recording')
-            self.scroll_text.show()
-            self.scroll_text.setText(self.current_page.text)
-            self.scroll_text.adjustSize()
+            self.timed_text.show()
+            self.scroll_area.show()
+
+
+            # Spacebar actions for Base Recording
+            self.spacebar_actions.append(self.recording_on)
+            self.spacebar_actions.append(self.recording_off)
+
+        elif(type(self.current_page) is TimedRecording):
+            self.title.show()
+            self.title.setText('Press space to begin recording')
+            self.timed_text.setText(self.current_page.text)
+            self.showLabel(self.timed_text.scroll_text)
+            self.timed_text.show()
             self.scroll_area.show()
 
 
