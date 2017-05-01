@@ -18,12 +18,14 @@ class AudioRecorder:
             self.stream = self.audio.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK, start=False)
         except Exception:
             print("No audio input device detected!")
+            self.stream = None
             
         self.audio_buffer = []
         self.recording_thread = {}
         
     def __del__(self):
-        self.stream.close()
+        if self.stream is not None:
+            self.stream.close()
         self.audio.terminate()
                 
     def recordAudio(self):

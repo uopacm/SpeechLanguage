@@ -12,10 +12,10 @@ import json
 class IntroScreen(QWidget):
     def __init__(self, parent):
         super(IntroScreen, self).__init__(parent)
-        self.setGeometry(50, 50, 500, 300)
-        self.setWindowTitle("PyQT tuts!")
+        self.setFocusPolicy(Qt.StrongFocus)
         self.payload = []
         self.setupItems()
+        self.subject_id = ''
 
     def subject_file_name(self, i, style, condition):
         """ Returns a formatted subject name. Eg. 043017-A01-M-PWS """
@@ -38,9 +38,9 @@ class IntroScreen(QWidget):
         if subject_num is None:
             style = 'A{}'
             subject_num = self.next_subject_num(style, condition, 10, 100)
-                
-        os.makedirs(self.subject_file_name(subject_num, style, condition))
-        self.hide()
+
+        self.subject_id = self.subject_file_name(subject_num, style, condition)
+        os.makedirs(self.subject_id)
 
     def setupItems(self):
         m = datetime.datetime.today().month
@@ -93,13 +93,6 @@ class IntroScreen(QWidget):
         self.l.addWidget(self.female)
         self.l.addWidget(self.stutter)
         self.l.addWidget(self.nostutter)
-
-        #self.setCentralWidget(self.w)
-
-        self.btn = QPushButton('Continue', self)
-        self.btn.clicked.connect(self.create_subject_id_and_folder)
-        self.btn.resize(self.btn.minimumSizeHint())
-        self.btn.move(10, 100)
 
         self.show()
 

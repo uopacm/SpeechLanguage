@@ -1,9 +1,10 @@
 import sys
 from PyQt5 import QtGui
 
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea
+from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import *
+from PyQt5 import Qt
 
 import random
 
@@ -19,15 +20,29 @@ WAV_IMAGE_WIDTH = 1000
 from intro import IntroScreen
 
 
+class MyEventFilter(QObject):
+    def __init__(self, top_level):
+        super().__init__()
+        self.app = top_level
+        
+    def eventFilter(self, receiver, event):
+        if(event.type() == QEvent.KeyPress):
+            self.app.keyPressEvent(event)
+            return True
+        else:      
+            #Call Base Class Method to Continue Normal Event Processing
+            return super(MyEventFilter,self).eventFilter(receiver, event)
+
 # Skeleton source from online
 class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.left = 500
         self.top = 300
-        self.windowWidth = 1720
-        self.windowHeight = 1000
-
+        self.windowWidth = 1000
+        self.windowHeight = 800
+        self.font = QtGui.QFont()
+        
         self.initUI()
 
         # Setup everything for audio recording
@@ -62,11 +77,13 @@ class App(QMainWindow):
 
         # Not quite sure about the differences between all the layout options....
         self.layout = QGridLayout()
-        self.scroll_area = QScrollArea(self)
 
         # IntroScreen
         self.intro_screen = IntroScreen(self)
         self.layout.addWidget(self.intro_screen)
+        self.center(self.intro_screen)
+        self.intro_screen.setFixedWidth(500)
+        self.intro_screen.setFixedHeight(300)
         self.intro_screen.show()
         
         # Pacman Progress Bar
@@ -78,27 +95,47 @@ class App(QMainWindow):
         self.pacman.lower()
         self.pacman.setWindowOpacity(0.9)
         self.layout.addWidget(self.pacman)
-        self.pacman.show()
+        self.pacman.hide()
         
-        # Widgets used for application
+        # Scroll Area
+        self.scroll_area = QScrollArea(self)
+        self.scroll_area.move(self.width()/4, self.height()/4)
+        self.scroll_area.setFixedWidth(700)
+        self.scroll_area.setFixedHeight(500)
+        self.scroll_area.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.scroll_area)
+        self.scroll_area.hide()
+
+        # Scrolling Text
+        self.scroll_text = QLabel(self)
+        self.showLabel(self.scroll_text)
+        self.layout.addWidget(self.scroll_text)
+        self.scroll_area.setWidget(self.scroll_text)
+        self.scroll_text.adjustSize()
+        self.scroll_text.hide()
+        
         self.phrase = QLabel(self)
+        self.showLabel(self.phrase)
+        self.phrase.move(self.width()/4, self.height()/4)
+        self.phrase.setFixedHeight(500)
+        self.phrase.setFixedWidth(500)
+        self.layout.addWidget(self.phrase)
+        self.phrase.hide()
+
         self.title = QLabel(self)
-        self.font = QtGui.QFont()
+        self.title.move(self.width()/4, self.height()/8)
+        self.title.setFixedHeight(100)
+        self.title.setFixedWidth(300)
+        self.layout.addWidget(self.title)
+        self.title.hide()
         
         # Image for the wav form trimming
         self.wav_image = QLabel(self)
         self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
-
-        # Add widgets to layout
-        self.layout.addWidget(self.title)
-        self.scroll_area.setWidget(self.phrase)
-        self.layout.addWidget(self.scroll_area)
         self.layout.addWidget(self.wav_image)
-
+        self.wav_image.hide()
         
         # Hide all widgets for now
-        self.phrase.hide()
-        self.wav_image.hide()
         self.show()
         
 
@@ -109,8 +146,6 @@ class App(QMainWindow):
         subject_info = "subejct1"
         self.content = setup_study(subject_info)
         self.next_page()
-        self.showPhrases()
-        self.showTitle()
 
     def showLabel(self, label):
         # Edit phrase
@@ -123,22 +158,11 @@ class App(QMainWindow):
                               
     def showTitle(self):
         self.showLabel(self.title)
-        self.title.move(self.width()/4, self.height()/4)
+        self.title.move(self.width()/2, self.height()/2)
         self.title.show()
 
     def center(self, w):
         w.move(self.width()/4, self.height()/4)
-        
-    def showPhrases(self):
-        # Read in first paragraph of phrases.txt
-        # text = open('phrases.txt').read().splitlines()
-        # line = random.choice(text) # Choose random line
-        self.showLabel(self.phrase)
-        self.phrase.move(self.width()/4, self.height()/2)
-        self.scroll_area.adjustSize()
-        self.scroll_area.move(self.width()/4, self.height()/2)
-        self.scroll_area.setWidgetResizable(True)
-        self.phrase.show()
     
     def recording_on(self):
             self.audio_recorder.start_recording(self.current_page.output_file)
@@ -153,21 +177,35 @@ class App(QMainWindow):
     def next_page(self):
         self.spacebar_actions = []
         self.current_page = self.content.pop(0)
-
+        
         if(self.current_page is None):
             # Exit the program
             pass
 
+        if(type(self.current_page) is Intro):
+            self.intro_screen.show()
+            self.title.hide()
+            self.phrase.hide()
+            self.spacebar_actions.append(self.intro_screen.create_subject_id_and_folder)
+        
         # ------ Setup a Text  Window Page --------
         elif(type(self.current_page) is TextWindow):
+            self.intro_screen.hide()
             self.title.show()
             self.title.setText(self.current_page.header)
+            self.phrase.show()
             self.phrase.setText(self.current_page.text)
 
         # ------ Setup a Base Recording Page ---------
         elif(type(self.current_page) is BaseRecording):
-            self.title.hide()
-            self.phrase.setText(self.current_page.text)
+            self.phrase.hide()
+            self.title.show()
+            self.title.setText('Press space to begin recording')
+            self.scroll_text.show()
+            self.scroll_text.setText(self.current_page.text)
+            self.scroll_text.adjustSize()
+            self.scroll_area.show()
+
 
             # Spacebar actions for Base Recording
             self.spacebar_actions.append(self.recording_on)
@@ -181,13 +219,19 @@ class App(QMainWindow):
                 
             
     def keyPressEvent(self, event):
-        if not self.spacebar_actions:
-            self.next_page()
-        else:
-            action = self.spacebar_actions.pop(0)
-            action()
+        print(str(event.key()) + ' ' + str(Qt.Key_Space))
+        if event.key() == Qt.Key_Space:
+            print("press")
+            if not self.spacebar_actions:
+                self.next_page()
+            else:
+                
+                action = self.spacebar_actions.pop(0)
+                action()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
+    f = MyEventFilter(ex)
+    app.installEventFilter(f)
     sys.exit(app.exec_())
