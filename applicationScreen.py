@@ -16,7 +16,7 @@ from QRoundProgressBar import *
 
 WAV_IMAGE_HEIGHT = 500
 WAV_IMAGE_WIDTH = 1000
-
+from intro import IntroScreen
 
 
 # Skeleton source from online
@@ -64,6 +64,11 @@ class App(QMainWindow):
         self.layout = QGridLayout()
         self.scroll_area = QScrollArea(self)
 
+        # IntroScreen
+        self.intro_screen = IntroScreen(self)
+        self.layout.addWidget(self.intro_screen)
+        self.intro_screen.show()
+        
         # Pacman Progress Bar
         self.pacman = QRoundProgressBar(self)
         self.pacman.setBarStyle(2) # Pie
