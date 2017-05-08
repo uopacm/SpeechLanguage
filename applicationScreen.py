@@ -1,4 +1,5 @@
 import sys
+import wave
 from PyQt5 import QtGui
 
 from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider
@@ -61,6 +62,7 @@ class App(QMainWindow):
         self.spacebar_actions.append(self.intro_complete)
 
         self.timer = QTimer()
+        self.base_recording_times = {}
         
         # Have run() handle all methods
         self.run()
@@ -186,6 +188,15 @@ class App(QMainWindow):
         self.intro_screen.create_subject_id_and_folder()
         self.content = setup_study(self.intro_screen.subject_id)
         self.next_page()
+
+    def set_trimed_audio_time(self):
+        start = 1/float(self.begin_slider.value())
+        end = 1/float(self.end_slider.value())
+        r = wave.open(self.current_page.output_file + ".wav", 'r')
+        
+        
+
+        
             
     def next_page(self):
         self.spacebar_actions = []
