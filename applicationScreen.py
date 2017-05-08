@@ -57,10 +57,11 @@ class App(QMainWindow):
 
         # Sequences the actions for the space bar
         self.spacebar_actions = []
+        self.enter_actions = []
 
         # Holds the info for the current page
         self.current_page = Intro()
-        self.spacebar_actions.append(self.intro_complete)
+        self.enter_actions.append(self.intro_complete)
 
         self.timer = QTimer()
         self.cutoff_timer = QTimer()
@@ -148,6 +149,13 @@ class App(QMainWindow):
         self.title.setFixedHeight(100)
         self.title.setFixedWidth(300)
         self.layout.addWidget(self.title)
+
+        self.footer = QLabel(self)
+        self.footer.move(self.width()/4, self.height() * 0.75)
+        self.footer.setFixedHeight(100)
+        self.footer.setFixedWidth(300)
+        self.layout.addWidget(self.footer)
+
         
         # Image for the wav form trimming
         self.wav_image = QLabel(self)
@@ -180,6 +188,8 @@ class App(QMainWindow):
         # self.get_subect_info()
         self.hide_all()
         self.intro_screen.show()
+        self.footer.setText('Press ENTER to continue')
+        self.footer.show()
 
     def showLabel(self, label):
         # Edit phrase
@@ -204,7 +214,9 @@ class App(QMainWindow):
             self.audio_recorder.stop_recording()
             self.cutoff_timer.stop() # Just in case the timed recording is stopped early
             self.title.setText("Recording off.")
-            self.title.show()        
+            self.title.show()
+            self.footer.setText('Press ENTER to continue')
+            self.footer.show()
 
     def timer_tick(self, time_limit):
         def tick():
@@ -258,10 +270,13 @@ class App(QMainWindow):
         elif(type(self.current_page) is TextWindow):
             self.title.show()
             self.title.setText(self.current_page.header)
+            self.title.adjustSize()
             self.phrase.show()
             self.phrase.setText(self.current_page.text)
             self.phrase.adjustSize()
             self.scroll_area.show()
+            self.footer.setText('Press ENTER to continue')
+            self.footer.show()
 
         # ------ Setup a Base Recording Page ---------
         elif(type(self.current_page) is BaseRecording):
@@ -271,6 +286,8 @@ class App(QMainWindow):
             self.phrase.show()
             self.phrase.setText(self.current_page.text)
             self.phrase.adjustSize()
+            self.footer.setText('Press SPACE to begin recording')
+            self.footer.show()
 
             # Spacebar actions for Base Recording
             self.spacebar_actions.append(self.recording_on)
@@ -283,6 +300,8 @@ class App(QMainWindow):
             self.timed_text.pacman.value = 0
             self.showLabel(self.timed_text.scroll_text)
             self.timed_text.show()
+            self.footer.setText('Press SPACE to begin recording')
+            self.footer.show()
             
             base_time = self.base_recording_times[self.current_page.passage]
             record_time = base_time * self.current_page.percentage
@@ -294,6 +313,8 @@ class App(QMainWindow):
             self.timer.start(1) # Update the pacman every msec
 
             self.recording_on()
+            self.footer.setText('Press SPACE to stop recording')
+            self.footer.show()
 
 
             # Spacebar actions for Base Recording
@@ -306,6 +327,8 @@ class App(QMainWindow):
             self.wav_image.show()
             self.begin_slider.show()
             self.end_slider.show()
+            self.footer.setText('Press ENTER to continue')
+            self.footer.show()
 
         elif(type(self.current_page) is Survey):
             self.questionnaire.show()
@@ -314,13 +337,17 @@ class App(QMainWindow):
                 
             
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Space:
-            if not self.spacebar_actions:
+        if event.key() == Qt.Key_Return:
+            if not self.enter_actions and not self.spacebar_actions:
                 self.next_page()
+            elif not self.enter_actions:
+                pass
             else:
+                self.enter_actions.pop(0)()
+        elif event.key() == Qt.Key_Space:
+            if len(self.spacebar_actions) > 0:
+                self.spacebar_actions.pop(0)()
                 
-                action = self.spacebar_actions.pop(0)
-                action()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
