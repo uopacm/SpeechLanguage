@@ -6,7 +6,7 @@ import contextlib
 
 # Give filename without extension
 def generatePng(filename):
-    with wave.open(filename + '.wav', 'r') as spf:
+    with contextlib.closing(wave.open(filename + '.wav', 'r')) as spf:
 
         signal = spf.readframes(-1)
         signal = np.fromstring(signal, 'Int16')
