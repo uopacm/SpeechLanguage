@@ -1,5 +1,6 @@
 import sys
 import wave
+import contextlib
 from PyQt5 import QtGui
 
 from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider
@@ -62,7 +63,30 @@ class App(QMainWindow):
         self.spacebar_actions.append(self.intro_complete)
 
         self.timer = QTimer()
-        self.base_recording_times = {}
+        self.cutoff_timer = QTimer()
+        self.time_limit = 0.0
+        self.base_recording_times = {
+            'piper' : 5000.0,
+            'seashells' : 5000.0,
+            'woodchuck' : 5000.0,
+            'tutor' : 5000.0,
+            'oyster' : 5000.0,
+            'perkins' : 5000.0,
+            'moses' : 5000.0,
+            'blackbear' : 5000.0,
+            'chester' : 5000.0,
+            'betty' : 5000.0,
+            '1' : 5000.0,
+            '2' : 5000.0,
+            '3' : 5000.0,
+            '4' : 5000.0,
+            '5' : 5000.0,
+            '6' : 5000.0,
+            '7' : 5000.0,
+            '8' : 5000.0,
+            '9' : 5000.0,
+            '10' : 5000.0
+        }
         
         # Have run() handle all methods
         self.run()
@@ -178,11 +202,15 @@ class App(QMainWindow):
 
     def recording_off(self):
             self.audio_recorder.stop_recording()
+            self.cutoff_timer.stop() # Just in case the timed recording is stopped early
             self.title.setText("Recording off.")
             self.title.show()        
 
-    def timer_tick(self):
-        self.timed_text.pacman.setValue(self.timed_text.pacman.value + 1)
+    def timer_tick(self, time_limit):
+        def tick():
+            interval = 100.0 / time_limit
+            self.timed_text.pacman.setValue(self.timed_text.pacman.value + interval)
+        return tick
 
     def intro_complete(self):
         self.intro_screen.create_subject_id_and_folder()
@@ -192,12 +220,28 @@ class App(QMainWindow):
     def set_trimed_audio_time(self):
         start = 1/float(self.begin_slider.value())
         end = 1/float(self.end_slider.value())
-        r = wave.open(self.current_page.output_file + ".wav", 'r')
+        with contextlib.closing(wave.open(self.current_page.output_file + ".wav", 'r')) as r:
+            frames = r.getnframes()
+            rate = f.getframerate()
+            duration = frames / float(rate)
+            self.base_recording_times[self.current_page.output_file] = duration * (end - start)
         
-        
+    def record_survey_response(self):
+        responses = []
 
+        # Do some kind of check to make sure that all the options are selected
         
+        for question in self.questionnaire.button_group_questions:            
+            responses.append(question.checkedButton)
+            question.setExclusive(False)
+            for button in question.buttons():
+                button.setChecked(False)
+            question.setExclusive(True)
             
+        with open(self.current_page.output_file,'w') as output:
+            output.write(str(responses))
+                
+        
     def next_page(self):
         self.spacebar_actions = []
         self.current_page = self.content.pop(0)
@@ -236,14 +280,23 @@ class App(QMainWindow):
             self.title.show()
             self.title.setText('Press space to begin recording')
             self.timed_text.setText(self.current_page.text)
+            self.timed_text.pacman.value = 0
             self.showLabel(self.timed_text.scroll_text)
             self.timed_text.show()
-            self.timer.timeout.connect(self.timer_tick)
-            self.timer.start(1000)
+            
+            base_time = self.base_recording_times[self.current_page.passage]
+            record_time = base_time * self.current_page.percentage
+            self.timer.timeout.connect(self.timer_tick(record_time))
+            self.cutoff_timer.timeout.connect(self.recording_off)
+            self.cutoff_timer.setSingleShot(True) # Event only fires after time elapses
+            
+            self.cutoff_timer.start(record_time)
+            self.timer.start(1) # Update the pacman every msec
+
+            self.recording_on()
 
 
             # Spacebar actions for Base Recording
-            self.spacebar_actions.append(self.recording_on)
             self.spacebar_actions.append(self.recording_off)
             
         elif(type(self.current_page) is TrimAudio):
@@ -256,6 +309,8 @@ class App(QMainWindow):
 
         elif(type(self.current_page) is Survey):
             self.questionnaire.show()
+
+            self.spacebar_actions.append(self.record_survey_response)
                 
             
     def keyPressEvent(self, event):

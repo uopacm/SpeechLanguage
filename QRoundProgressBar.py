@@ -26,7 +26,7 @@ class QRoundProgressBar(QWidget):
         super(QRoundProgressBar, self).__init__(parent)
         self.min = 0
         self.max = 100
-        self.value = 25
+        self.value = 0
 
         self.nullPosition = self.PositionTop
         self.barStyle = self.StyleDonut
