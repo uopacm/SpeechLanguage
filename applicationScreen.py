@@ -3,7 +3,7 @@ import wave
 import contextlib
 from PyQt5 import QtGui
 
-from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider
+from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider, QPushButton
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import *
 from PyQt5 import Qt
@@ -11,6 +11,7 @@ from PyQt5 import Qt
 import random
 
 from recordSound import AudioRecorder
+from AudioPlayback import *
 
 from study import *
 import waveform
@@ -51,6 +52,7 @@ class App(QMainWindow):
 
         # Setup everything for audio recording
         self.audio_recorder = AudioRecorder()
+        self.audio_playback = AudioPlayback()
 
         # Holds a Queue of the different page contents
         self.content = {}
@@ -177,6 +179,15 @@ class App(QMainWindow):
         self.end_slider.move(self.width() * 0.125, self.height() * 0.7)
         self.end_slider.setFixedWidth(750)
         self.layout.addWidget(self.end_slider)
+
+        # Trim audio playback buttons
+        self.trim_audio_begin_button = QPushButton('Play', self)
+        self.trim_audio_begin_button.move(0, self.height() * 0.6)
+        self.trim_audio_begin_button.clicked.connect(self.playback_on(self.begin_slider))
+        
+        self.trim_audio_end_button = QPushButton('Play', self)
+        self.trim_audio_end_button.clicked.connect(self.playback_on(self.end_slider))
+        self.trim_audio_end_button.move(0, self.height() * 0.7)
         
         
         self.show()
@@ -201,25 +212,39 @@ class App(QMainWindow):
 
     def hide_all(self):
         self.timed_text.hide()
+        self.trim_audio_begin_button.hide()
+        self.trim_audio_end_button.hide()
         for i in range(self.layout.count()):
             self.layout.itemAt(i).widget().hide()
                               
     
     def recording_on(self):
-            self.audio_recorder.start_recording(self.current_page.output_file)
-            self.title.setText("Recording on.")
-            self.title.show()
-            self.footer.setText('Press SPACE to stop recording')
-            self.footer.show()
+        self.audio_recorder.start_recording(self.current_page.output_file)
+        self.title.setText("Recording on.")
+        self.title.show()
+        self.footer.setText('Press SPACE to stop recording')
+        self.footer.show()
 
     def recording_off(self):
-            self.audio_recorder.stop_recording()
-            self.cutoff_timer.stop() # Just in case the timed recording is stopped early
-            self.title.setText("Recording off.")
-            self.title.show()
-            self.footer.setText('Press ENTER to continue')
-            self.footer.show()
+        self.audio_recorder.stop_recording()
+        self.cutoff_timer.stop() # Just in case the timed recording is stopped early
+        self.title.setText("Recording off.")
+        self.title.show()
+        self.footer.setText('Press ENTER to continue')
+        self.footer.show()
 
+    def playback_on(self, slider):
+        def play_from():
+            start = float(1/slider.value()) if slider.value() != 0 else 0
+            self.audio_playback.play(self.current_page.wav_file + '.wav', start)
+            self.footer.setText('Press SPACE to stop playback')
+            self.spacebar_actions.append(self.playback_off)
+        return play_from
+
+    def playback_off(self):
+        self.audio_playback.stop()
+        self.footer.setText('Press ENTER to complete trimming')
+        
     def timer_tick(self, time_limit):
         def tick():
             interval = 100.0 / time_limit
@@ -329,7 +354,9 @@ class App(QMainWindow):
             self.wav_image.setPixmap(image.scaled(WAV_IMAGE_WIDTH, WAV_IMAGE_HEIGHT))
             self.wav_image.show()
             self.begin_slider.show()
+            self.trim_audio_begin_button.show()
             self.end_slider.show()
+            self.trim_audio_end_button.show()
             self.footer.setText('Press ENTER to continue')
             self.footer.show()
 
