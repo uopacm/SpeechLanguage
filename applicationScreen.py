@@ -209,6 +209,8 @@ class App(QMainWindow):
             self.audio_recorder.start_recording(self.current_page.output_file)
             self.title.setText("Recording on.")
             self.title.show()
+            self.footer.setText('Press SPACE to stop recording')
+            self.footer.show()
 
     def recording_off(self):
             self.audio_recorder.stop_recording()
@@ -298,6 +300,7 @@ class App(QMainWindow):
             self.title.setText('Press space to begin recording')
             self.timed_text.setText(self.current_page.text)
             self.timed_text.pacman.value = 0
+            self.timed_text.text.adjustSize()
             self.showLabel(self.timed_text.scroll_text)
             self.timed_text.show()
             self.footer.setText('Press SPACE to begin recording')
@@ -332,8 +335,9 @@ class App(QMainWindow):
 
         elif(type(self.current_page) is Survey):
             self.questionnaire.show()
-
-            self.spacebar_actions.append(self.record_survey_response)
+            self.footer.setText('Are you ready for the next one? Press ENTER to continue.')
+            self.footer.show()
+            self.enter_actions.append(self.record_survey_response)
                 
             
     def keyPressEvent(self, event):
