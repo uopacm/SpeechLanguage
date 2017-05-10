@@ -38,6 +38,23 @@ class MyEventFilter(QObject):
             #Call Base Class Method to Continue Normal Event Processing
             return super(MyEventFilter,self).eventFilter(receiver, event)
 
+class DataPoint():
+    def __init__(self):
+        self.passage = ''
+        self.time = 0
+        self.survey_results = []
+        self.target_file = ''
+        self.is_base = True
+        self.percentage = 0.0
+
+    def __str__(self):
+        result = self.passage + ', ' + str(self.time) + ', '
+        if  not self.is_base:
+            result += str(self.percentage) + ', '
+        for question in self.survey_results:
+            result += str(question) + ', '
+        return result
+
 # Skeleton source from online
 class App(QMainWindow):
 
@@ -64,6 +81,9 @@ class App(QMainWindow):
         self.spacebar_actions = []
         self.enter_actions = []
 
+        self.subject_id = ''
+        self.data_result = DataPoint()
+    
         # Holds the info for the current page
         self.current_page = Intro()
         self.enter_actions.append(self.intro_complete)
@@ -276,30 +296,51 @@ class App(QMainWindow):
         self.next_page()
 
     def set_trimed_audio_time(self):
-        start = 1/float(self.begin_slider.value())
-        end = 1/float(self.end_slider.value())
-        with contextlib.closing(wave.open(self.current_page.output_file + ".wav", 'r')) as r:
+        start = self.begin_slider.value()/float(self.AUDIO_TRIM)
+        end = self.end_slider.value() / float(self.AUDIO_TRIM )
+        with contextlib.closing(wave.open(self.current_page.wav_file + ".wav", 'r')) as r:
             frames = r.getnframes()
-            rate = f.getframerate()
+            rate = r.getframerate()
             duration = frames / float(rate)
-            self.base_recording_times[self.current_page.output_file] = duration * (end - start)
-        
+            print (str(end) + ' ' + str(start))
+            self.base_recording_times[self.current_page.passage] = (duration * end) - (duration * start)
+            self.data_result.time = (duration * end) - (duration * start)
+
+    def record_timed_data(self):
+        with contextlib.closing(wave.open(self.current_page.output_file, 'r')) as r:
+            frames = r.getnframes()
+            rate = r.getframerate()
+            duration = frames / float(rate)
+            self.data_result.time = duration
+    
+    def record_passage_name(self, name):
+        self.data_result.passage = name
+    
     def record_survey_response(self):
         responses = []
 
         # Do some kind of check to make sure that all the options are selected
         
-        for question in self.questionnaire.button_group_questions:            
-            responses.append(question.checkedButton)
+        for question in self.questionnaire.button_group_questions:
+            i = 1
+            for button in question.buttons():
+                if button.isChecked():
+                    responses.append(i)
+                else:
+                    i += 1
+                
+                
             question.setExclusive(False)
             for button in question.buttons():
                 button.setChecked(False)
             question.setExclusive(True)
-            
-        with open(self.current_page.output_file,'w') as output:
-            output.write(str(responses))
+
+        self.data_result.survey_results = responses
                 
-        
+    def record_data_point(self):
+        with open(self.data_result.target_file, 'a+') as output:
+            output.write(str(self.data_result) + '\n')
+    
     def next_page(self):
         self.spacebar_actions = []
         self.current_page = self.content.pop(0)
@@ -334,6 +375,9 @@ class App(QMainWindow):
             self.phrase.adjustSize()
             self.footer.setText('Press SPACE to begin recording')
             self.footer.show()
+            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-base.txt'
+            self.record_passage_name(self.current_page.passage)
+            self.data_result.is_base = True
 
             # Spacebar actions for Base Recording
             self.spacebar_actions.append(self.recording_on)
@@ -344,28 +388,32 @@ class App(QMainWindow):
             self.title.setText('Press space to begin recording')
             self.timed_text.setText(self.current_page.text)
             self.timed_text.pacman.value = 0
-            self.timed_text.text.adjustSize()
             self.showLabel(self.timed_text.scroll_text)
             self.timed_text.show()
             self.footer.setText('Press SPACE to begin recording')
             self.footer.show()
+            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-timed.txt'
+            self.data_result.is_base = False
+            self.data_result.percentage = self.current_page.percentage
             
             base_time = self.base_recording_times[self.current_page.passage]
             record_time = base_time * self.current_page.percentage
             self.timer.timeout.connect(self.timer_tick(record_time))
             self.cutoff_timer.timeout.connect(self.recording_off)
             self.cutoff_timer.setSingleShot(True) # Event only fires after time elapses
-            
+            print(str(record_time))
             self.cutoff_timer.start(record_time)
             self.timer.start(1) # Update the pacman every msec
 
             self.recording_on()
             self.footer.setText('Press SPACE to stop recording')
             self.footer.show()
-
+            self.record_passage_name(self.current_page.passage)
 
             # Spacebar actions for Base Recording
             self.spacebar_actions.append(self.recording_off)
+            self.enter_actions.append(self.record_timed_data)
+
             
         elif(type(self.current_page) is TrimAudio):
             waveform.generatePng(self.current_page.wav_file)
@@ -379,11 +427,17 @@ class App(QMainWindow):
             self.footer.setText('Press ENTER to continue')
             self.footer.show()
 
+            self.enter_actions.append(self.set_trimed_audio_time)
+            self.enter_actions.append(self.record_data_point)
+
         elif(type(self.current_page) is Survey):
             self.questionnaire.show()
             self.footer.setText('Are you ready for the next one? Press ENTER to continue.')
             self.footer.show()
             self.enter_actions.append(self.record_survey_response)
+
+            if not self.data_result.is_base:
+                self.enter_actions.append(self.record_data_point)
                 
             
     def keyPressEvent(self, event):

@@ -14,20 +14,22 @@ class TextWindow:
         
 # Used to hold the data for and indicate a base recording window
 class BaseRecording:
-    def __init__(self, output_file, text):
+    def __init__(self, passage, output_file, text):
+        self.passage = passage
         self.text = text
         self.output_file = output_file + '.wav'
 
 class TrimAudio:
-    def __init__(self, wav_file):
+    def __init__(self, passage, wav_file):
+        self.passage = passage
         self.wav_file = wav_file
         
 # Used to hold the data for and indicate a timed recording window
 class TimedRecording:
-    def __init__(self,  passage, percentage, text):
+    def __init__(self, passage, subject, percentage, text):
         self.text = text
         self.passage = passage
-        self.output_file = passage + ".wav"
+        self.output_file = subject + '/' + subject + '-' + passage + ".wav"
         self.percentage = percentage
 
 # Used to indicate a questionaire page
@@ -39,17 +41,17 @@ def add_passages(subject, content, text):
     for passage in text:
         for (name, twister) in passage.items():
             file_name = subject + '/' + subject + '-' + name
-            content.append(BaseRecording(file_name, twister))
+            content.append(BaseRecording(name, file_name, twister))
             content.append(Survey(file_name))
-            content.append(TrimAudio(file_name))
+            content.append(TrimAudio(name, file_name))
 
 def timed_passages(subject, text):
     sessions = []
     for passage in text:
         for (name, twister) in passage.items():
             for pcent in [0.7,0.4,0.2]:
-                file_name = subject + '/' + subject + '-' + name + str(pcent)
-                sessions.append([TimedRecording(name, pcent, twister),
+                file_name = subject + '/' + subject + '-timed'
+                sessions.append([TimedRecording(name, subject, pcent, twister),
                                 Survey(file_name)])
     return sessions
 
@@ -71,8 +73,8 @@ def setup_study(subject):
 #        content.append(TextWindow("The First Phase",
 #                                  "Nice reading! Now, it's time for the first phase of our experiment. You will presented with multiple reading tasks. Please read them out loud at your own natural pace. When you start reading, press the spacebar. When you finish reading, press the spacebar.\n\nAfter each reading task, a series of questions will be presented, asking you to rate you experience. Please answer each question on a scale of 1 to 5 (1=low, 5=high). Once you have finished answering the questions, please press the spacebar to start the next reading. Again, when you start reading, press the spacebar and when you finish reading, press the spacebar. If you have any questions about the task, please ask the examiner at this time.",                   "When you are ready to begin, press the spacebar to start."))
 
-        add_passages(subject, content, text['twisters'])
-        add_passages(subject, content, text['anomalous'])
+#        add_passages(subject, content, text['twisters'])
+#        add_passages(subject, content, text['anomalous'])
         
         timed = []
         timed.extend(timed_passages(subject, text['twisters']))
