@@ -1,6 +1,13 @@
 import pyaudio
 import wave
 import threading
+import struct
+import numpy
+
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
 
 class AudioPlayback():
     CHUNK = 1024
@@ -17,28 +24,39 @@ class AudioPlayback():
     def play(self, file_path, start):
         if not self.is_playing:
             self.is_playing = True
-            f = wave.open(file_path, 'rb')
-            self.stream = self.audio.open(
-                format = self.audio.get_format_from_width(f.getsampwidth()),
-                channels = f.getnchannels(),
-                rate = f.getframerate(),
-                output = True)
-            r  = f.getframerate()
-            self.audio_buffer = f.readframes(self.CHUNK)
-            audio_len = len(self.audio_buffer)
-            self.audio_buffer = self.audio_buffer[int(start * audio_len) :]
+            # open wave file
+            track = wave.open(file_path, 'rb')
+            start *=  track.getnframes() /  float(track.getframerate())
+            
+            # initialize audio
+            py_audio = pyaudio.PyAudio()
+            self.stream = py_audio.open(format=py_audio.get_format_from_width(track.getsampwidth()),
+                       channels=track.getnchannels(),
+                       rate=track.getframerate(),
+                       output=True)
+
+            # skip unwanted frames
+            
+            n_frames = (int((start * track.getframerate())))
+            print(str(n_frames) + '/' + str(track.getnframes()))
+
+            # write desired frames to audio buffer
+            data = list(chunks(track.readframes(track.getnframes())[n_frames:], self.CHUNK))
             def audio_thread():
-                while self.audio_buffer and self.is_playing:
-                    self.stream.write(self.audio_buffer)
-                    self.audio_buffer = f.readframes(self.CHUNK)
+                for frame in data:
+                    if not self.is_playing:
+                        break
+                    self.stream.write(frame)
+                    
             self.play_thread = threading.Thread(target=audio_thread)
             self.play_thread.start()
 
     def stop(self):
         if(self.is_playing):
             self.is_playing = False
-            self.play_thread.join()
             self.stream.stop_stream()
+            self.stream.close()
+            self.play_thread.join()
             self.audio_buffer = []
 
     

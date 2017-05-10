@@ -40,6 +40,9 @@ class MyEventFilter(QObject):
 
 # Skeleton source from online
 class App(QMainWindow):
+
+    AUDIO_TRIM = 1000
+    
     def __init__(self):
         super().__init__()
         self.left = 500
@@ -173,11 +176,13 @@ class App(QMainWindow):
         self.begin_slider = QSlider(Qt.Horizontal,self)
         self.begin_slider.move(self.width() * 0.125, self.height() * 0.6)
         self.begin_slider.setFixedWidth(750)
+        self.begin_slider.setRange(0,self.AUDIO_TRIM)
         self.layout.addWidget(self.begin_slider)
         
         self.end_slider = QSlider(Qt.Horizontal, self)
         self.end_slider.move(self.width() * 0.125, self.height() * 0.7)
         self.end_slider.setFixedWidth(750)
+        self.end_slider.setRange(0,self.AUDIO_TRIM)
         self.layout.addWidget(self.end_slider)
 
         # Trim audio playback buttons
@@ -235,8 +240,12 @@ class App(QMainWindow):
 
     def playback_on(self, slider):
         def play_from():
-            start = float(1/slider.value()) if slider.value() != 0 else 0
-            self.audio_playback.play(self.current_page.wav_file + '.wav', start)
+            duration = 0
+            audio_file = self.current_page.wav_file + '.wav'
+
+            start = (slider.value())/float(self.AUDIO_TRIM) if slider.value() != 0 else 0
+            print(str(start))
+            self.audio_playback.play(audio_file, start)
             self.footer.setText('Press SPACE to stop playback')
             self.spacebar_actions.append(self.playback_off)
         return play_from
