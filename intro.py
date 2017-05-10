@@ -16,6 +16,12 @@ class IntroScreen(QWidget):
         self.payload = []
         self.setupItems()
         self.subject_id = ''
+        self.setStyleSheet("""
+        .QWidget {
+            border-radius: 8px;
+            background-color: lightgrey;
+            }
+        """)
 
     def subject_file_name(self, i, style, condition):
         """ Returns a formatted subject name. Eg. 043017-A01-M-PWS """

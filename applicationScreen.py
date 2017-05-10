@@ -156,10 +156,20 @@ class App(QMainWindow):
         self.layout.addWidget(self.title)
 
         self.footer = QLabel(self)
-        self.footer.move(self.width()/4, self.height() * 0.75)
-        self.footer.setFixedHeight(100)
+        self.footer.setFixedHeight(30)
         self.footer.setFixedWidth(300)
+        self.footer.move(
+            self.width()/2-self.footer.width()/2, 
+            (self.height() * 0.9) if (self.height() * 0.9 + self.footer.height() < self.height()) else (self.height() - self.footer.height())
+        )
         self.layout.addWidget(self.footer)
+        self.footer.setStyleSheet("""
+        .QLabel {
+            border-radius: 8px;
+            background-color: lightgrey;
+            padding: 2px;
+            }
+        """)
 
         
         # Image for the wav form trimming

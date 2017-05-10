@@ -1,1 +1,0 @@
-[<built-in method checkedButton of QButtonGroup object at 0x000002B3952C84C8>, <built-in method checkedButton of QButtonGroup object at 0x000002B3952C8558>, <built-in method checkedButton of QButtonGroup object at 0x000002B3952C85E8>, <built-in method checkedButton of QButtonGroup object at 0x000002B3952C8678>]
