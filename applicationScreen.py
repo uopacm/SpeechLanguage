@@ -140,7 +140,7 @@ class App(QMainWindow):
         self.layout.addWidget(self.intro_screen)
         self.intro_screen.setFixedWidth(500)
         self.intro_screen.setFixedHeight(300)
-        self.intro_screen.move(self.width()/4, self.height()/4)
+        self.intro_screen.move(self.width()/2-self.intro_screen.width()/2, self.height()/4)
         self.intro_screen.show()
         
         # Scroll Area
