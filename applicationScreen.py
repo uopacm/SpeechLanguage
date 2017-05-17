@@ -427,17 +427,24 @@ class App(QMainWindow):
             self.footer.setText('Press ENTER to continue')
             self.footer.show()
 
-            self.enter_actions.append(self.set_trimed_audio_time)
-            self.enter_actions.append(self.record_data_point)
+            def trim_audio_action():
+                self.set_trimed_audio_time()
+                self.record_data_point()
+                
+            self.enter_actions.append(trim_audio_action)
+
 
         elif(type(self.current_page) is Survey):
             self.questionnaire.show()
             self.footer.setText('Are you ready for the next one? Press ENTER to continue.')
             self.footer.show()
-            self.enter_actions.append(self.record_survey_response)
 
-            if not self.data_result.is_base:
-                self.enter_actions.append(self.record_data_point)
+            def survey_action():
+                self.record_survey_response()
+                if not self.data_result.is_base:
+                    self.record_data_point()
+            
+            self.enter_actions.append(survey_action)
                 
             
     def keyPressEvent(self, event):
