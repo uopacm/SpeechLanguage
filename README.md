@@ -2,7 +2,7 @@
 Experimental Software Description
 
 ## Installation
-With PIP install:
+The following Python packages are required (we suggest conda)
 - pyqt5
 - pyaudio
 - numpy
