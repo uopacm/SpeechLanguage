@@ -37,11 +37,13 @@ class AudioPlayback():
 
             # skip unwanted frames
             
-            n_frames = (int((start * track.getframerate())))
-            print(str(n_frames) + '/' + str(track.getnframes()))
+            n_frames = int(start * track.getframerate())
+            chunk_size = track.getnchannels() * track.getsampwidth()
+
+            clip = track.readframes(track.getnframes())[n_frames * chunk_size:]
 
             # write desired frames to audio buffer
-            data = list(chunks(track.readframes(track.getnframes())[n_frames:], self.CHUNK))
+            data = list(chunks(clip, self.CHUNK))
             def audio_thread():
                 for frame in data:
                     if not self.is_playing:
