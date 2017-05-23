@@ -75,7 +75,8 @@ class App(QMainWindow):
         self.audio_playback = AudioPlayback()
 
         # Holds a Queue of the different page contents
-        self.content = [TextWindow("", "Reading Fluency with Time Pressure Study", "To begin study, please press RETURN"), Intro()]
+        self.experiement_start = [TextWindow("", "Reading Fluency with Time Pressure Study", "To begin study, please press RETURN"), Intro()]
+        self.content = self.experiment_start
 
         # Sequences the actions for the space bar
         self.spacebar_actions = []
@@ -383,8 +384,9 @@ class App(QMainWindow):
         self.hide_all()
         
         if(self.current_page is None):
-            # Exit the program
-            pass            
+            # Restart experiment
+            self.content = self.experiement_start
+            
 
         elif(type(self.current_page) is Intro):
             self.intro_screen.show()

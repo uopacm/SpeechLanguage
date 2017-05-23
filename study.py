@@ -69,10 +69,12 @@ def setup_study(subject):
         content.append(BaseRecording('rainbow',subject + '/' + subject + "-rainbow-text", text['rainbow'][0]['rainbow']))
     
         content.append(TextWindow("The First Phase",
-                                 "Nice reading! Now, it's time for the first phase of our experiment. You will presented with multiple reading tasks. Please read them out loud at your own natural pace. Before you start reading, press the spacebar. When you finish reading, press the spacebar.\n\nAfter each reading task, a series of questions will be presented, asking you to rate you experience. Please answer each question on a scale of 1 to 5 (1=low, 5=high). Once you have finished answering the questions, please press the spacebar to start the next reading. Again, when you start reading, press the spacebar and when you finish reading, press the spacebar. If you have any questions about the task, please ask the examiner at this time.",                   "When you are ready to begin, press the spacebar to start."))
+                                 "Nice reading! Now, it's time for the first phase of our experiment. You will be presented with multiple reading tasks. Please read them out loud at your own natural pace. Before you start reading, press the spacebar. When you finish reading, press the spacebar.\n\nAfter each reading task, a series of statements will be presented, asking you to rate you experience. Please respond to each statement on a scale of 1 to 5 (1=low, 5=high). Once you have finished responding to the statements, please press the spacebar to start the next reading. Again, before you start reading, press the spacebar and when you finish reading, press the spacebar. If you have any questions about the task, please ask the examiner at this time.", "When you are ready to begin, press the spacebar to start."))
 
         add_passages(subject, content, text['twisters'])
         add_passages(subject, content, text['anomalous'])
+
+        content.append(TextWindow("The Second Phase", "Thank you for your cooperation so far! In this last part, when the sentence is presented, press the spacebar before you start reading. Please read as much as you can until the coil around the sentence disappears. Sometimes the coil unravels slowly, other times it may unravel quickly. Just read whatever you can before the coil and reading disappears.\n\nPlease press the spacebar if you finish reading the passage before the coil fully unravels. You will read sentences that you have previously read before.\n\nAfter each sentence, you will be asked to respond to similar statements about your experience on a scale of 1 to 5 (similar to the first part of this experiement). Upon completion of the last rating, a new reading task will be offered.", "Ready to begin? Press RETURN to start your first reading."))
         
         timed = []
         timed.extend(timed_passages(subject, text['twisters']))
@@ -81,4 +83,6 @@ def setup_study(subject):
         timed = [page for section in timed for page in section]
         
         content.extend(timed)
+
+        content.append(TextWindow("", "Wow! You've made it through our entire experiment! Thank you so much for participating! If you have any questions, please ask the experimenter at this time.", ""))
         return content
