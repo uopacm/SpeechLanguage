@@ -4,7 +4,7 @@ import contextlib
 from PyQt5 import QtGui
 
 from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider, QPushButton
-from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QPen
+from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QPen, QFont
 from PyQt5.QtCore import *
 from PyQt5 import Qt
 
@@ -64,7 +64,7 @@ class App(QMainWindow):
         super().__init__()
         self.left = 500
         self.top = 300
-        self.windowWidth = 1000
+        self.windowWidth = 1200
         self.windowHeight = 800
         self.font = QtGui.QFont()
         
@@ -75,7 +75,7 @@ class App(QMainWindow):
         self.audio_playback = AudioPlayback()
 
         # Holds a Queue of the different page contents
-        self.experiement_start = [TextWindow("", "Reading Fluency with Time Pressure Study", "To begin study, please press RETURN"), Intro()]
+        self.experiment_start = [TextWindow("", "Reading Fluency with Time Pressure Study", "To begin study, please press RETURN"), Intro()]
         self.content = self.experiment_start
 
         # Sequences the actions for the space bar
@@ -139,13 +139,13 @@ class App(QMainWindow):
         self.layout.addWidget(self.intro_screen)
         self.intro_screen.setFixedWidth(500)
         self.intro_screen.setFixedHeight(300)
-        self.intro_screen.move(self.width()/2-self.intro_screen.width()/2, self.height()/4)
+        self.intro_screen.move(self.width() * 0.35, self.height()/2)
         self.intro_screen.show()
         
         # Scroll Area
         self.scroll_area = QScrollArea(self)
         self.scroll_area.move(self.width()/4, self.height()/4)
-        self.scroll_area.setFixedWidth(700)
+        self.scroll_area.setFixedWidth(740)
         self.scroll_area.setFixedHeight(500)
         self.scroll_area.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.scroll_area)
@@ -160,10 +160,9 @@ class App(QMainWindow):
 
         # Normal Phrase
         self.phrase = QLabel(self)
+        self.phrase.setFont(QFont('Helvetica',16))
         self.showLabel(self.phrase)
         self.phrase.move(self.width()/4, self.height()/4)
-#        self.phrase.setFixedHeight(500)
-#        self.phrase.setFixedWidth(500)
         self.layout.addWidget(self.phrase)
         self.scroll_area.setWidget(self.phrase)
 
@@ -273,9 +272,7 @@ class App(QMainWindow):
 
     def showLabel(self, label):
         # Edit phrase
-        self.font.setPointSize(12)
         label.setWordWrap(True)
-        label.setFont(self.font)
         label.setAlignment(Qt.AlignCenter)
         label.adjustSize()
 
@@ -299,7 +296,7 @@ class App(QMainWindow):
         self.cutoff_timer.stop() # Just in case the timed recording is stopped early
         self.title.setText("Recording off.")
         self.title.show()
-        self.footer.setText('Press ENTER to continue')
+        self.footer.setText('Press RETURN to continue')
         self.footer.show()
 
     def playback_on(self, slider):
@@ -316,7 +313,7 @@ class App(QMainWindow):
 
     def playback_off(self):
         self.audio_playback.stop()
-        self.footer.setText('Press ENTER to complete trimming')
+        self.footer.setText('Press RETURN to complete trimming')
         
     def timer_tick(self, time_limit):
         def tick():
@@ -427,7 +424,7 @@ class App(QMainWindow):
 
         elif(type(self.current_page) is TimedRecording):
             self.title.show()
-            self.title.setText('Press space to begin recording')
+            self.title.setText('Press SPACE to begin recording')
             self.timed_text.setText(self.current_page.text)
             self.timed_text.pacman.value = 0
             self.showLabel(self.timed_text.scroll_text)
@@ -466,7 +463,7 @@ class App(QMainWindow):
             self.trim_audio_begin_button.show()
             self.end_slider.show()
             self.trim_audio_end_button.show()
-            self.footer.setText('Press ENTER to continue')
+            self.footer.setText('Press RETURN to continue')
             self.footer.show()
             self.is_trimming = True
             self.update()
