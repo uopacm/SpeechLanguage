@@ -4,7 +4,7 @@ import contextlib
 from PyQt5 import QtGui
 
 from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider, QPushButton
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QPen
 from PyQt5.QtCore import *
 from PyQt5 import Qt
 
@@ -20,8 +20,8 @@ from QRoundProgressBar import *
 from QTimedText import *
 from questionnaire import Questionnaire
 
-WAV_IMAGE_HEIGHT = 500
-WAV_IMAGE_WIDTH = 1000
+WAV_IMAGE_HEIGHT = 490
+WAV_IMAGE_WIDTH = 832
 from intro import IntroScreen
 
 
@@ -195,6 +195,7 @@ class App(QMainWindow):
         # Image for the wav form trimming
         self.wav_image = QLabel(self)
         self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
+        self.wav_image.move(self.width() * 0.100, 0)
         self.layout.addWidget(self.wav_image)
 
         # Questionnaire
@@ -207,13 +208,18 @@ class App(QMainWindow):
         self.begin_slider.move(self.width() * 0.125, self.height() * 0.6)
         self.begin_slider.setFixedWidth(750)
         self.begin_slider.setRange(0,self.AUDIO_TRIM)
+        self.begin_slider.valueChanged.connect(self.call_update)
         self.layout.addWidget(self.begin_slider)
         
         self.end_slider = QSlider(Qt.Horizontal, self)
         self.end_slider.move(self.width() * 0.125, self.height() * 0.7)
         self.end_slider.setFixedWidth(750)
         self.end_slider.setRange(0,self.AUDIO_TRIM)
+        self.end_slider.valueChanged.connect(self.call_update)
         self.layout.addWidget(self.end_slider)
+
+        # Trim Lines
+        self.is_trimming = False
 
         # Trim audio playback buttons
         self.trim_audio_begin_button = QPushButton('Play', self)
@@ -226,8 +232,40 @@ class App(QMainWindow):
         
         
         self.show()
-        
 
+    def call_update(self):
+        self.update()
+        
+    def paintEvent(self, e):
+#        print('ping')
+        if self.is_trimming:
+            qp = QPainter()
+            qp.begin(self)
+
+            # Draw Image
+            rect = QRect(self.width() * 0.085, 0, WAV_IMAGE_WIDTH, WAV_IMAGE_HEIGHT)
+            qp.drawPixmap(rect, QPixmap(self.current_page.wav_file + '.png'))
+
+            def slider_x(slider):
+                slider_start = slider.value()
+                return (self.width() * 0.125) + ((slider_start/float(self.AUDIO_TRIM)) * 750
+                        if slider_start != 0 else 0)
+
+                        # Begin Line
+            pen = QPen(Qt.black, 2, Qt.SolidLine)
+            qp.setPen(pen)
+            qp.drawLine(slider_x(self.begin_slider), self.height() * 0.6, slider_x(self.begin_slider), 0)
+
+            pen = QPen(Qt.red, 2, Qt.SolidLine)
+            qp.setPen(pen)
+            qp.drawLine(slider_x(self.end_slider), self.height() * 0.6, slider_x(self.end_slider), 0)
+            
+            qp.end()
+        else:
+            qp = QPainter()
+            qp.begin(self)
+            qp.end()
+        
     def run(self):
 
         # Get subject id
@@ -418,18 +456,23 @@ class App(QMainWindow):
         elif(type(self.current_page) is TrimAudio):
             waveform.generatePng(self.current_page.wav_file)
             image = QPixmap(self.current_page.wav_file + '.png')
-            self.wav_image.setPixmap(image.scaled(WAV_IMAGE_WIDTH, WAV_IMAGE_HEIGHT))
-            self.wav_image.show()
+#            self.wav_image.setPixmap(image.scaled(WAV_IMAGE_WIDTH, WAV_IMAGE_HEIGHT))
+#            self.wav_image.show()
             self.begin_slider.show()
             self.trim_audio_begin_button.show()
             self.end_slider.show()
             self.trim_audio_end_button.show()
             self.footer.setText('Press ENTER to continue')
             self.footer.show()
+            self.is_trimming = True
+            self.update()
+
 
             def trim_audio_action():
                 self.set_trimed_audio_time()
                 self.record_data_point()
+                self.is_trimming = False
+                self.update()
                 
             self.enter_actions.append(trim_audio_action)
 
@@ -455,6 +498,8 @@ class App(QMainWindow):
                 pass
             else:
                 self.enter_actions.pop(0)()
+                if not self.enter_actions:
+                    self.next_page()
         elif event.key() == Qt.Key_Space:
             if len(self.spacebar_actions) > 0:
                 self.spacebar_actions.pop(0)()
