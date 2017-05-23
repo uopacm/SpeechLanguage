@@ -49,7 +49,7 @@ def timed_passages(subject, text):
     sessions = []
     for passage in text:
         for (name, twister) in passage.items():
-            for pcent in [0.7,0.4,0.2]:
+            for pcent in [0.9,0.6,0.3]:
                 file_name = subject + '/' + subject + '-timed'
                 sessions.append([TimedRecording(name, subject, pcent, twister),
                                 Survey(file_name)])

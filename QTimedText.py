@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
 from QRoundProgressBar import *
+from PyQt5.QtGui import *
 
 
 class QTimedText(QWidget):
@@ -18,6 +19,7 @@ class QTimedText(QWidget):
         self.scroll_text = QLabel(self)
 #        self.showLabel(self.scroll_text)
         self.scroll_text.adjustSize()
+        self.scroll_text.setFont(QFont('Helvetica', 16))
         self.scroll_text.setGeometry((self.width()-100)/2, (self.height()-100)/2 , 100, 100)
         self.layout.addWidget(self.scroll_text)
         

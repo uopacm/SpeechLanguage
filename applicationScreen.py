@@ -3,8 +3,8 @@ import wave
 import contextlib
 from PyQt5 import QtGui
 
-from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider, QPushButton
-from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QPen, QFont
+from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider, QPushButton, QSpinBox
+from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QPen, QFont, QIntValidator
 from PyQt5.QtCore import *
 from PyQt5 import Qt
 
@@ -152,8 +152,8 @@ class App(QMainWindow):
 
         # Timed Text
         self.timed_text = QTimedText(self)
-        self.timed_text.setFixedWidth(500)
-        self.timed_text.setFixedHeight(600)
+        self.timed_text.setFixedWidth(740)
+        self.timed_text.setFixedHeight(500)
         self.timed_text.move(self.width() * 0.25, self.height() * 0.25)
         self.showLabel(self.timed_text.scroll_text)
         self.layout.addWidget(self.timed_text)
@@ -227,6 +227,11 @@ class App(QMainWindow):
         self.trim_audio_end_button = QPushButton('Play', self)
         self.trim_audio_end_button.clicked.connect(self.playback_on(self.end_slider))
         self.trim_audio_end_button.move(0, self.height() * 0.7)
+
+        # Trim audio text dialogue
+        self.trim_audio_entry = QSpinBox(self)
+        self.trim_audio_entry.move(0, self.height() * 0.8)
+        self.layout.addWidget(self.trim_audio_entry)
         
         
         self.show()
@@ -317,8 +322,10 @@ class App(QMainWindow):
         
     def timer_tick(self, time_limit):
         def tick():
-            interval = 100.0 / time_limit
-            self.timed_text.pacman.setValue(self.timed_text.pacman.value + interval)
+            interval = 100.0 / float(time_limit)
+            self.timed_text.pacman.setValue(self.timed_text.pacman.value - interval)
+            if self.timed_text.pacman.value == 0:
+                self.recording_off()
         return tick
 
     def intro_complete(self):
@@ -329,13 +336,15 @@ class App(QMainWindow):
     def set_trimed_audio_time(self):
         start = self.begin_slider.value()/float(self.AUDIO_TRIM)
         end = self.end_slider.value() / float(self.AUDIO_TRIM )
+        disruption = self.trim_audio_entry.value()
         with contextlib.closing(wave.open(self.current_page.wav_file + ".wav", 'r')) as r:
             frames = r.getnframes()
             rate = r.getframerate()
             duration = frames / float(rate)
-            print (str(end) + ' ' + str(start))
-            self.base_recording_times[self.current_page.passage] = (duration * end) - (duration * start)
-            self.data_result.time = (duration * end) - (duration * start)
+            result_time = ((duration * end) - (duration * start)) - disruption
+            print(str(result_time))
+            self.base_recording_times[self.current_page.passage] = result_time
+            self.data_result.time = result_time
 
     def record_timed_data(self):
         with contextlib.closing(wave.open(self.current_page.output_file, 'r')) as r:
@@ -374,18 +383,17 @@ class App(QMainWindow):
     
     def next_page(self):
         self.spacebar_actions = []
-        self.current_page = self.content.pop(0)
+        if(self.content):
+            self.current_page = self.content.pop(0)
+        else:
+            # Restart experiment
+            self.content = self.experiment_start
 
         # Just hide everything so each page doesn't have
         # to worry about what was already being dispalyed
         self.hide_all()
-        
-        if(self.current_page is None):
-            # Restart experiment
-            self.content = self.experiement_start
-            
-
-        elif(type(self.current_page) is Intro):
+              
+        if(type(self.current_page) is Intro):
             self.intro_screen.show()
             self.footer.setText('Press ENTER to continue')
             self.footer.show()
@@ -426,7 +434,7 @@ class App(QMainWindow):
             self.title.show()
             self.title.setText('Press SPACE to begin recording')
             self.timed_text.setText(self.current_page.text)
-            self.timed_text.pacman.value = 0
+            self.timed_text.pacman.value = 100
             self.showLabel(self.timed_text.scroll_text)
             self.timed_text.show()
             self.footer.setText('Press SPACE to begin recording')
@@ -436,12 +444,12 @@ class App(QMainWindow):
             self.data_result.percentage = self.current_page.percentage
             
             base_time = self.base_recording_times[self.current_page.passage]
-            record_time = base_time * self.current_page.percentage
+            record_time = base_time * self.current_page.percentage * 1000 # Converting to miliseconds
             self.timer.timeout.connect(self.timer_tick(record_time))
-            self.cutoff_timer.timeout.connect(self.recording_off)
-            self.cutoff_timer.setSingleShot(True) # Event only fires after time elapses
+  #          self.cutoff_timer.timeout.connect(self.recording_off)
+ #           self.cutoff_timer.setSingleShot(True) # Event only fires after time elapses
             print(str(record_time))
-            self.cutoff_timer.start(record_time)
+#            self.cutoff_timer.start(record_time) 
             self.timer.start(1) # Update the pacman every msec
 
             self.recording_on()
@@ -463,6 +471,7 @@ class App(QMainWindow):
             self.trim_audio_begin_button.show()
             self.end_slider.show()
             self.trim_audio_end_button.show()
+            self.trim_audio_entry.show()
             self.footer.setText('Press RETURN to continue')
             self.footer.show()
             self.is_trimming = True
