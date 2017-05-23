@@ -75,7 +75,7 @@ class App(QMainWindow):
         self.audio_playback = AudioPlayback()
 
         # Holds a Queue of the different page contents
-        self.content = {}
+        self.content = [TextWindow("", "Reading Fluency with Time Pressure Study", "To begin study, please press RETURN"), Intro()]
 
         # Sequences the actions for the space bar
         self.spacebar_actions = []
@@ -84,9 +84,7 @@ class App(QMainWindow):
         self.subject_id = ''
         self.data_result = DataPoint()
     
-        # Holds the info for the current page
-        self.current_page = Intro()
-        self.enter_actions.append(self.intro_complete)
+
 
         self.timer = QTimer()
         self.cutoff_timer = QTimer()
@@ -270,10 +268,7 @@ class App(QMainWindow):
 
         # Get subject id
         # self.get_subect_info()
-        self.hide_all()
-        self.intro_screen.show()
-        self.footer.setText('Press ENTER to continue')
-        self.footer.show()
+        self.next_page()
 
     def showLabel(self, label):
         # Edit phrase
@@ -390,6 +385,13 @@ class App(QMainWindow):
         if(self.current_page is None):
             # Exit the program
             pass            
+
+        elif(type(self.current_page) is Intro):
+            self.intro_screen.show()
+            self.footer.setText('Press ENTER to continue')
+            self.footer.show()
+            
+            self.enter_actions.append(self.intro_complete)
         
         # ------ Setup a Text  Window Page --------
         elif(type(self.current_page) is TextWindow):
@@ -400,7 +402,7 @@ class App(QMainWindow):
             self.phrase.setText(self.current_page.text)
             self.phrase.adjustSize()
             self.scroll_area.show()
-            self.footer.setText('Press ENTER to continue')
+            self.footer.setText(self.current_page.footer)
             self.footer.show()
 
         # ------ Setup a Base Recording Page ---------

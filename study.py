@@ -61,7 +61,7 @@ def setup_study(subject):
         text = json.load(data_file)
 
         content = []
-
+        
         content.append(TextWindow("Welcome and thank you for participating in our experiment!",
                                  "First, we need a sample of your reading! The passage you will read is called \"The Rainbow Passage.\" When the passage is presented, press the spacebar when you start reading and press the spacebar again when you are finished reading.",
                                  "Are you ready? Press the spacebar for the passage to appear."))
