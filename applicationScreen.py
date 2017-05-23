@@ -336,7 +336,7 @@ class App(QMainWindow):
     def set_trimed_audio_time(self):
         start = self.begin_slider.value()/float(self.AUDIO_TRIM)
         end = self.end_slider.value() / float(self.AUDIO_TRIM )
-        disruption = self.trim_audio_entry.value()
+        disruption = self.trim_audio_entry.value() * 0.01 # Convert from centiseconds to seconds
         with contextlib.closing(wave.open(self.current_page.wav_file + ".wav", 'r')) as r:
             frames = r.getnframes()
             rate = r.getframerate()
