@@ -75,8 +75,9 @@ class App(QMainWindow):
         self.audio_playback = AudioPlayback()
 
         # Holds a Queue of the different page contents
-        self.experiment_start = [TextWindow("", "Reading Fluency with Time Pressure Study", "To begin study, please press RETURN"), Intro()]
-        self.content = self.experiment_start
+        self.experiment_start = [TextWindow(" ", "Reading Fluency with Time Pressure Study", "To begin study, please press RETURN"), Intro()]
+        self.content = []
+        self.content.extend(self.experiment_start)
 
         # Sequences the actions for the space bar
         self.spacebar_actions = []
@@ -85,10 +86,7 @@ class App(QMainWindow):
         self.subject_id = ''
         self.data_result = DataPoint()
     
-
-
         self.timer = QTimer()
-        self.cutoff_timer = QTimer()
         self.time_limit = 0.0
         self.base_recording_times = {
             'piper' : 5000.0,
@@ -298,7 +296,6 @@ class App(QMainWindow):
 
     def recording_off(self):
         self.audio_recorder.stop_recording()
-        self.cutoff_timer.stop() # Just in case the timed recording is stopped early
         self.title.setText("Recording off.")
         self.title.show()
         self.footer.setText('Press RETURN to continue')
@@ -387,7 +384,7 @@ class App(QMainWindow):
             self.current_page = self.content.pop(0)
         else:
             # Restart experiment
-            self.content = self.experiment_start
+            qApp.quit()
 
         # Just hide everything so each page doesn't have
         # to worry about what was already being dispalyed
@@ -446,10 +443,7 @@ class App(QMainWindow):
             base_time = self.base_recording_times[self.current_page.passage]
             record_time = base_time * self.current_page.percentage * 1000 # Converting to miliseconds
             self.timer.timeout.connect(self.timer_tick(record_time))
-  #          self.cutoff_timer.timeout.connect(self.recording_off)
- #           self.cutoff_timer.setSingleShot(True) # Event only fires after time elapses
             print(str(record_time))
-#            self.cutoff_timer.start(record_time) 
             self.timer.start(1) # Update the pacman every msec
 
             self.recording_on()
@@ -465,8 +459,6 @@ class App(QMainWindow):
         elif(type(self.current_page) is TrimAudio):
             waveform.generatePng(self.current_page.wav_file)
             image = QPixmap(self.current_page.wav_file + '.png')
-#            self.wav_image.setPixmap(image.scaled(WAV_IMAGE_WIDTH, WAV_IMAGE_HEIGHT))
-#            self.wav_image.show()
             self.begin_slider.show()
             self.trim_audio_begin_button.show()
             self.end_slider.show()
@@ -516,8 +508,10 @@ class App(QMainWindow):
                 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = App()
-    f = MyEventFilter(ex)
-    app.installEventFilter(f)
-    sys.exit(app.exec_())
+    while True:
+        app = QApplication(sys.argv)
+        ex = App()
+        f = MyEventFilter(ex)
+        app.installEventFilter(f)
+        app.exec_()
+        ex.close()
