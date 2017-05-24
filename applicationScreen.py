@@ -324,6 +324,7 @@ class App(QMainWindow):
             self.timed_text.pacman.setValue(self.timed_text.pacman.value - interval)
             if self.timed_text.pacman.value == 0:
                 self.recording_off()
+                self.timed_text.hide()
         return tick
 
     def intro_complete(self):
