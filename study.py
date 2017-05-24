@@ -29,7 +29,7 @@ class TimedRecording:
     def __init__(self, passage, subject, percentage, text):
         self.text = text
         self.passage = passage
-        self.output_file = subject + '/' + subject + '-' + passage + ".wav"
+        self.output_file = subject + '/' + subject + '-' + passage + "-" + str(percentage) + ".wav"
         self.percentage = percentage
 
 # Used to indicate a questionaire page

@@ -31,7 +31,7 @@ class MyEventFilter(QObject):
         self.app = top_level
         
     def eventFilter(self, receiver, event):
-        if(event.type() == QEvent.KeyPress):
+        if(event.type() == QEvent.KeyPress and (event.key() == Qt.Key_Return or event.key() == Qt.Key_Space)):
             self.app.keyPressEvent(event)
             return True
         else:      
@@ -46,9 +46,10 @@ class DataPoint():
         self.target_file = ''
         self.is_base = True
         self.percentage = 0.0
+        self.subject_id = ' '
 
     def __str__(self):
-        result = self.passage + ', ' + str(self.time) + ', '
+        result = self.passage + ', ' + str(round(self.time, 2)) + ', '
         if  not self.is_base:
             result += str(self.percentage) + ', '
         for question in self.survey_results:
@@ -328,6 +329,7 @@ class App(QMainWindow):
     def intro_complete(self):
         self.intro_screen.create_subject_id_and_folder()
         self.content = setup_study(self.intro_screen.subject_id)
+        self.data_result.subject_id = self.subject_id
         self.next_page()
 
     def set_trimed_audio_time(self):
@@ -376,7 +378,7 @@ class App(QMainWindow):
                 
     def record_data_point(self):
         with open(self.data_result.target_file, 'a+') as output:
-            output.write(str(self.data_result) + '\n')
+            output.write(self.intro_screen.subject_info + str(self.data_result) + '\n')
     
     def next_page(self):
         self.spacebar_actions = []
