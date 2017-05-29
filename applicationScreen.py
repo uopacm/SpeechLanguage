@@ -136,14 +136,12 @@ class App(QMainWindow):
         # IntroScreen
         self.intro_screen = IntroScreen(self)
         self.layout.addWidget(self.intro_screen)
-        self.intro_screen.setFixedWidth(500)
+        self.intro_screen.setFixedWidth(700)
         self.intro_screen.setFixedHeight(300)
-        self.intro_screen.move(self.width() * 0.35, self.height()/2)
         self.intro_screen.show()
         
         # Scroll Area
         self.scroll_area = QScrollArea(self)
-        self.scroll_area.move(self.width()/4, self.height()/4)
         self.scroll_area.setFixedWidth(740)
         self.scroll_area.setFixedHeight(500)
         self.scroll_area.setAlignment(Qt.AlignCenter)
@@ -153,7 +151,6 @@ class App(QMainWindow):
         self.timed_text = QTimedText(self)
         self.timed_text.setFixedWidth(740)
         self.timed_text.setFixedHeight(500)
-        self.timed_text.move(self.width() * 0.25, self.height() * 0.25)
         self.showLabel(self.timed_text.scroll_text)
         self.layout.addWidget(self.timed_text)
 
@@ -167,7 +164,6 @@ class App(QMainWindow):
 
         # Page Titles
         self.title = QLabel(self)
-        self.title.move(self.width()/4, self.height()/8)
         self.title.setFixedHeight(100)
         self.title.setFixedWidth(300)
         self.layout.addWidget(self.title)
@@ -175,10 +171,6 @@ class App(QMainWindow):
         self.footer = QLabel(self)
         self.footer.setFixedHeight(30)
         self.footer.setFixedWidth(300)
-        self.footer.move(
-            self.width()/2-self.footer.width()/2, 
-            (self.height() * 0.9) if (self.height() * 0.9 + self.footer.height() < self.height()) else (self.height() - self.footer.height())
-        )
         self.layout.addWidget(self.footer)
         self.footer.setStyleSheet("""
         .QLabel {
@@ -192,24 +184,20 @@ class App(QMainWindow):
         # Image for the wav form trimming
         self.wav_image = QLabel(self)
         self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
-        self.wav_image.move(self.width() * 0.100, 0)
         self.layout.addWidget(self.wav_image)
 
         # Questionnaire
         self.questionnaire = Questionnaire(self)
-        self.questionnaire.move(self.width()/4, self.height()/4)
         self.layout.addWidget(self.questionnaire)
 
         # Trim Audio Sliders
         self.begin_slider = QSlider(Qt.Horizontal,self)
-        self.begin_slider.move(self.width() * 0.125, self.height() * 0.6)
         self.begin_slider.setFixedWidth(750)
         self.begin_slider.setRange(0,self.AUDIO_TRIM)
         self.begin_slider.valueChanged.connect(self.call_update)
         self.layout.addWidget(self.begin_slider)
         
         self.end_slider = QSlider(Qt.Horizontal, self)
-        self.end_slider.move(self.width() * 0.125, self.height() * 0.7)
         self.end_slider.setFixedWidth(750)
         self.end_slider.setRange(0,self.AUDIO_TRIM)
         self.end_slider.valueChanged.connect(self.call_update)
@@ -219,22 +207,45 @@ class App(QMainWindow):
         self.is_trimming = False
 
         # Trim audio playback buttons
-        self.trim_audio_begin_button = QPushButton('Play', self)
-        self.trim_audio_begin_button.move(0, self.height() * 0.6)
-        self.trim_audio_begin_button.clicked.connect(self.playback_on(self.begin_slider))
-        
+        self.trim_audio_begin_button = QPushButton('Play', self)        
+        self.trim_audio_begin_button.clicked.connect(self.playback_on(self.begin_slider))        
         self.trim_audio_end_button = QPushButton('Play', self)
         self.trim_audio_end_button.clicked.connect(self.playback_on(self.end_slider))
-        self.trim_audio_end_button.move(0, self.height() * 0.7)
 
         # Trim audio text dialogue
         self.trim_audio_entry = QSpinBox(self)
-        self.trim_audio_entry.move(0, self.height() * 0.8)
         self.layout.addWidget(self.trim_audio_entry)
         
         
         self.show()
 
+    def update_widget_layout(self):
+        self.intro_screen.move(self.width() * 0.35, self.height()/2)        
+
+        self.scroll_area.setFixedHeight(self.height() * 0.6)
+        self.scroll_area.move(self.width()/4, self.height()/4)        
+
+        self.timed_text.move(self.width() * 0.25, self.height() * 0.25)
+        self.title.move(self.width()/4, self.height()/8)
+        self.footer.move(
+            self.width()/2-self.footer.width()/2, 
+            (self.height() * 0.9) if (self.height() * 0.9 + self.footer.height() < self.height()) else (self.height() - self.footer.height())
+        )
+
+        self.wav_image.move(self.width() * 0.100, 0)
+        
+        self.questionnaire.move(self.width()/4, self.height()/4)
+        
+        self.begin_slider.move(self.width() * 0.125, self.height() * 0.6)
+        self.end_slider.move(self.width() * 0.125, self.height() * 0.7)
+        
+        self.trim_audio_begin_button.move(0, self.height() * 0.6)
+        self.trim_audio_end_button.move(0, self.height() * 0.7)
+        self.trim_audio_entry.move(0, self.height() * 0.8)
+
+    def resizeEvent(self, event):
+        self.update_widget_layout()
+   
     def call_update(self):
         self.update()
         
@@ -269,7 +280,7 @@ class App(QMainWindow):
             qp.end()
         
     def run(self):
-
+        self.update_widget_layout()
         # Get subject id
         # self.get_subect_info()
         self.next_page()
