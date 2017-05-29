@@ -89,28 +89,7 @@ class App(QMainWindow):
     
         self.timer = QTimer()
         self.time_limit = 0.0
-        self.base_recording_times = {
-            'piper' : 5000.0,
-            'seashells' : 5000.0,
-            'woodchuck' : 5000.0,
-            'tutor' : 5000.0,
-            'oyster' : 5000.0,
-            'perkins' : 5000.0,
-            'moses' : 5000.0,
-            'blackbear' : 5000.0,
-            'chester' : 5000.0,
-            'betty' : 5000.0,
-            '1' : 5000.0,
-            '2' : 5000.0,
-            '3' : 5000.0,
-            '4' : 5000.0,
-            '5' : 5000.0,
-            '6' : 5000.0,
-            '7' : 5000.0,
-            '8' : 5000.0,
-            '9' : 5000.0,
-            '10' : 5000.0
-        }
+        self.base_recording_times = {}
         
         # Have run() handle all methods
         self.run()
@@ -353,7 +332,7 @@ class App(QMainWindow):
             rate = r.getframerate()
             duration = frames / float(rate)
             result_time = ((duration * end) - (duration * start)) - disruption
-            print(str(result_time))
+            print("saving time for: " + str(self.current_page.passage) + " " + str(result_time))
             self.base_recording_times[self.current_page.passage] = result_time
             self.data_result.time = result_time
 
