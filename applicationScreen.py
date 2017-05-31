@@ -149,7 +149,7 @@ class App(QMainWindow):
 
         self.footer = QLabel(self)
         self.footer.setFixedHeight(30)
-        self.footer.setFixedWidth(300)
+        self.footer.setFixedWidth(500)
         self.layout.addWidget(self.footer)
         self.footer.setStyleSheet("""
         .QLabel {
@@ -321,7 +321,6 @@ class App(QMainWindow):
         self.intro_screen.create_subject_id_and_folder()
         self.content = setup_study(self.intro_screen.subject_id)
         self.data_result.subject_id = self.subject_id
-        self.next_page()
 
     def set_trimed_audio_time(self):
         start = self.begin_slider.value()/float(self.AUDIO_TRIM)

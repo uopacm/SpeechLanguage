@@ -62,9 +62,7 @@ def setup_study(subject):
 
         content = []
         
-        content.append(TextWindow("Welcome and thank you for participating in our experiment!",
-                                 "First, we need a sample of your reading! The passage you will read is called \"The Rainbow Passage.\" When the passage is presented, press the spacebar when you start reading and press the spacebar again when you are finished reading.",
-                                 "Are you ready? Press the spacebar for the passage to appear."))
+        content.append(TextWindow("Welcome and thank you for participating in our experiment!", "First, we need a sample of your reading! The passage you will read is called \"The Rainbow Passage.\" When the passage is presented, press the spacebar when you start reading and press the spacebar again when you are finished reading.", "Are you ready? Press the spacebar for the passage to appear."))
     
         content.append(BaseRecording('rainbow',subject + '/' + subject + "-rainbow-text", text['rainbow'][0]['rainbow']))
     
@@ -74,7 +72,7 @@ def setup_study(subject):
         add_passages(subject, content, text['twisters'])
         add_passages(subject, content, text['anomalous'])
 
-        content.append(TextWindow("The Second Phase", "Thank you for your cooperation so far! In this last part, a passage will be presented and your recording time will begin immediately. Please read as much as you can until the timer around the sentence disappears. Sometimes the timer unravels slowly, other times it may unravel quickly. Just read whatever you can before the timer and reading disappears.\n\nPlease press the spacebar if you finish reading the passage before the timer fully unravels. You will read sentences that you have previously read before.\n\nAfter each sentence, you will be asked to respond to similar statements about your experience on a scale of 1 to 5 (similar to the first part of this experiement). Upon completion of the last rating, a new reading task will be offered.", "Ready to begin? Press RETURN to start your first reading."))
+        content.append(TextWindow("The Second Phase", "Thank you for your cooperation so far! In this last part, a passage will be presented and your recording time will begin immediately. Please read as much as you can until the timer by the sentence disappears. Sometimes the timer unravels slowly, other times it may unravel quickly. Just read whatever you can before the timer and reading disappears.\n\nPlease press the spacebar if you finish reading the passage before the timer fully unravels. You will read sentences that you have previously read before.\n\nAfter each sentence, you will be asked to respond to similar statements about your experience on a scale of 1 to 5 (similar to the first part of this experiement). Upon completion of the last rating, a new reading task will be offered.", "Ready to begin? Press RETURN to start your first reading."))
         
         timed = []
         timed.extend(timed_passages(subject, text['twisters']))
