@@ -101,7 +101,7 @@ class App(QMainWindow):
         exitAction = QAction(QIcon('exit.png'), '&Exit', self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Exit application')
-        exitAction.triggered.connect(qApp.quit)
+        exitAction.triggered.connect(qApp.exit)
 
         self.statusBar()
 
@@ -138,6 +138,7 @@ class App(QMainWindow):
         self.phrase.setFont(QFont('Helvetica',16))
         self.showLabel(self.phrase)
         self.phrase.move(self.width()/4, self.height()/4)
+        self.phrase.wordWrap = True
         self.layout.addWidget(self.phrase)
         self.scroll_area.setWidget(self.phrase)
 
@@ -202,7 +203,9 @@ class App(QMainWindow):
         self.intro_screen.move(self.width() * 0.35, self.height()/2)        
 
         self.scroll_area.setFixedHeight(self.height() * 0.6)
-        self.scroll_area.move(self.width()/4, self.height()/4)        
+        self.scroll_area.setFixedWidth(self.width() * 0.7)
+        self.scroll_area.move(self.width()/4, self.height()/4)
+        self.phrase.adjustSize()
 
         self.timed_text.move(self.width() * 0.25, self.height() * 0.25)
         self.title.move(self.width()/4, self.height()/8)
@@ -501,10 +504,9 @@ class App(QMainWindow):
                 
 
 if __name__ == '__main__':
+    app = QApplication(sys.argv)
     while True:
-        app = QApplication(sys.argv)
         ex = App()
         f = MyEventFilter(ex)
         app.installEventFilter(f)
         app.exec_()
-        ex.close()
