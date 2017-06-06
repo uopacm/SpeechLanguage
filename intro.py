@@ -2,7 +2,7 @@ import sys
 import os
 
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QPushButton, QRadioButton, QButtonGroup, QWidget, QHBoxLayout, QSpinBox
+from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QPushButton, QRadioButton, QButtonGroup, QWidget, QHBoxLayout, QVBoxLayout, QSpinBox
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import *
 
@@ -60,8 +60,22 @@ class IntroScreen(QWidget):
         ds += str(d)
         ys = str(datetime.datetime.today().year)
 
-        self.w = QWidget(self)
-        self.l = QHBoxLayout(self.w)
+        # Container for the whole widget
+        self.container = QWidget(self)
+        self.container_layout = QVBoxLayout(self.container)
+
+        # Top row
+        self.w = QWidget(self.container)
+        self.top = QHBoxLayout(self.w)
+        self.container_layout.addWidget(self.w)
+
+        # Bottom Section
+        self.bottm = QWidget(self.container)
+        self.bottom_options = QVBoxLayout(self.bottm)
+        self.experimenter_widget = QWidget(self.bottm)
+        self.expr_layout = QHBoxLayout(self.experimenter_widget)
+        self.bottom_options.addWidget(self.experimenter_widget)
+        self.container_layout.addWidget(self.bottm)
 
         self.payload.append('{}{}{}'.format(ms, ds, ys[2:]))
 
@@ -125,12 +139,16 @@ class IntroScreen(QWidget):
         self.payload.append(False)
         self.payload.extend([0,0,0,0])
 
-        self.l.addWidget(self.male)
-        self.l.addWidget(self.female)
-        self.l.addWidget(self.stutter)
-        self.l.addWidget(self.nostutter)
+        self.top.addWidget(self.male)
+        self.top.addWidget(self.female)
+        self.top.addWidget(self.stutter)
+        self.top.addWidget(self.nostutter)
         for e in self.experimenter_buttons:
-            self.l.addWidget(e)
+            self.expr_layout.addWidget(e)
+        self.bottom_options.addWidget(self.participant_label)
+        self.bottom_options.addWidget(self.participant)
+        self.bottom_options.addWidget(self.age_label)
+        self.bottom_options.addWidget(self.age)
 
         self.show()
 
