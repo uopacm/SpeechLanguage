@@ -145,12 +145,12 @@ class App(QMainWindow):
         # Page Titles
         self.title = QLabel(self)
         self.title.setFixedHeight(100)
-        self.title.setFixedWidth(300)
+        self.title.setFixedWidth(500)
         self.layout.addWidget(self.title)
 
         self.footer = QLabel(self)
         self.footer.setFixedHeight(30)
-        self.footer.setFixedWidth(300)
+        self.footer.setFixedWidth(500)
         self.layout.addWidget(self.footer)
         self.footer.setStyleSheet("""
         .QLabel {
@@ -313,18 +313,19 @@ class App(QMainWindow):
         
     def timer_tick(self, time_limit):
         def tick():
-            interval = 100.0 / float(time_limit)
+            interval = 100.0 / float(time_limit * 0.63)
             self.timed_text.pacman.setValue(self.timed_text.pacman.value - interval)
             if self.timed_text.pacman.value == 0:
                 self.recording_off()
                 self.timed_text.hide()
+                self.timer.stop()
+                self.timer = QTimer()
         return tick
 
     def intro_complete(self):
         self.intro_screen.create_subject_id_and_folder()
         self.content = setup_study(self.intro_screen.subject_id)
         self.data_result.subject_id = self.subject_id
-        self.next_page()
 
     def set_trimed_audio_time(self):
         start = self.begin_slider.value()/float(self.AUDIO_TRIM)
@@ -405,6 +406,9 @@ class App(QMainWindow):
             self.footer.setText(self.current_page.footer)
             self.footer.show()
 
+            if(self.title == 'THe Second Phase'):
+                print(str(self.base_recording_times))
+
         # ------ Setup a Base Recording Page ---------
         elif(type(self.current_page) is BaseRecording):
             self.title.show()
@@ -437,7 +441,7 @@ class App(QMainWindow):
             self.data_result.percentage = self.current_page.percentage
             
             base_time = self.base_recording_times[self.current_page.passage]
-            record_time = base_time * self.current_page.percentage * 1000 # Converting to miliseconds
+            record_time = (base_time * 1000) * self.current_page.percentage # Converting to miliseconds
             self.timer.timeout.connect(self.timer_tick(record_time))
             print(str(record_time))
             self.timer.start(1) # Update the pacman every msec

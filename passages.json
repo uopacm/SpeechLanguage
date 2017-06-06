@@ -1,10 +1,29 @@
 {
 	"rainbow":[
-		{"rainbow":"When the sunlight strikes raindrops in the air, they act like a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.\nThroughout the centruies men have explained the rainbow in various ways. Some have accepted it as a miracle without physical explanation. To the Hebrews it was a token that there would be no more universal floods. The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain. The Norsemen considered the rainbow as a bridge over which the gods passed from earth to their home in the sky. Other men have tried to explain the phenomenon physically. Aristotle thought that the rainbow was caused by the reflection of the sun's rays by the rain. Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbow.\nMany complicated ideas about the rainbow have been formed. The difference in the rainbow depends considerably upon the size the water drops, and the width of the colored band increases as the size of the drops increases. The actual primary rainbow observed is said to be the effect of superposition of a number of bows. If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green lights when mixed form yellow. This is a very common type of bow, one showing mainly red and yellow, with little or no green or blue."}
+		{"rainbow":"When the sunlight strikes raindrops in the air, they act like a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.\nThroughout the centruies men have explained the rainbow in various ways. Some have accepted it as a miracle without physical explanation. To the Hebrews it was a token that there would be no more universal floods. The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain. The Norsemen considered the rainbow as a bridge over which the gods passed from earth to their home in the sky. Other men have tried to explain the phenomenon physically. Aristotle thought that the rainbow was caused by the reflection of the sun's rays by the rain. Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbow.\nMany complicated ideas about the rainbow have been formed. The difference in the rainbow depends considerably upon the size of the water drops, and the width of the colored band increases as the size of the drops increases. The actual primary rainbow observed is said to be the effect of superposition of a number of bows. If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green lights when mixed form yellow. This is a very common type of bow, one showing mainly red and yellow, with little or no green or blue."}
 	],
 	"twisters":[
-		{"piper":"Peter Piper picked a peck of pickled peppers.\nDid Peter Piper pick a peck of pickled peppers?\nIf Peter Piper picked a peck of pickled peppers,\nWhere's the peck of pickled peppers Peter Piper picked?"}
+		{"piper":"Peter Piper picked a peck of pickled peppers.\nDid Peter Piper pick a peck of pickled peppers?\nIf Peter Piper picked a peck of pickled peppers,\nWhere's the peck of pickled peppers Peter Piper picked?"},
+		{"seashells":"She sells seashells by the seashore.\nThe shells she sells are surely seashells.\nSo if she sells shells on the seashore.\nI'm sure she sells seashore shells."},
+		{"woodchuck":"How much wood would a woodchuck chuck\nIf a woodchuck could chuck wood?\nHe would chuck, he would, as much as he could,\nAnd chuck as much as a woodchuck would\nIf a woodchuck could chuck wood."},
+		{"tutor":"A tutor who tooted the flute\nTried to tutor two tooters to toot\nsaid the two to their tutor:\n\"Is it harder to toot,\nOr to tutor two tooters to toot?\""},
+		{"oyster":"What noise annoys an oyster?\nThe noise that annoys an oyster\nIs a noise that knows no oyster"},
+		{"perkins":"Perspicacious Polly Perkins purchased Peter's product\nAnd peddled pickles to produce a pretty profit!\n"},
+		{"moses":"Moses supposes his toeses are roses,\nBut Moses supposes erroneously;\nFor nobody's toeses are poses of roses,\nAs moses supposes his toeses to be."},
+		{"blackbear":"A big black bear bit a big black bug\nAnd the big black bug bled black blood.\n"},
+		{"chester":"Chester shucked the chestnuts and Chuck chucked the shucks. Did Chester shuck the chestnuts faster than Chuck chucked the shucks, or did Chuck chuck the shucks faster than Chester shucked the chestnuts?"},
+		{"betty":"Betty bought a bit of butter, the butter Betty bought was a bit bitter, and made her batter bitter. But a bit of better butter makes better batter. So Betty bought a bit of better butter, making Betty's bitter batter better."}
 	],
 	"anomalous":[
+		{"1":"It's a peril when fad takes a foot from the parrot"},
+		{"2":"It was figgy to pat when the pun was a fogger"},
+		{"3":"You can ripple a load but a lot is more rapid"},
+		{"4":"If the lubber can run we can root for a label"},
+		{"5":"In the local a yen gets his yacht for some liquor"},
+		{"6":"Any bundle you pat leaves a pot for the bedding"},
+		{"7":"If the ribbon is wan it's too wet for a rebate"},
+		{"8":"We can rally to win but it's wet for a really"},
+		{"9":"There's a lipid whose name gives a nib to a leaper"},
+		{"10":"Give the jello a dog and a dock to the julep"}
 	]
 }
