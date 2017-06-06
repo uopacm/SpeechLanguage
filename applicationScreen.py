@@ -341,11 +341,14 @@ class App(QMainWindow):
             self.data_result.time = result_time
 
     def record_timed_data(self):
-        with contextlib.closing(wave.open(self.current_page.output_file, 'r')) as r:
-            frames = r.getnframes()
-            rate = r.getframerate()
-            duration = frames / float(rate)
-            self.data_result.time = duration
+        if self.audio_recorder.is_recording:
+            self.enter_actions.append(self.record_timed_data)
+        else:
+            with contextlib.closing(wave.open(self.current_page.output_file, 'r')) as r:
+                frames = r.getnframes()
+                rate = r.getframerate()
+                duration = frames / float(rate)
+                self.data_result.time = duration
     
     def record_passage_name(self, name):
         self.data_result.passage = name
