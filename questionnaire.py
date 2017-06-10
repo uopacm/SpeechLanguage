@@ -56,3 +56,9 @@ class Questionnaire(QWidget):
             count += 1
 
         self.adjustCounter += 1  # Will adjust coordinates for next question
+        
+    def is_completed(self):
+        for q in self.button_group_questions:
+            if q.checkedId() == -1:
+                return False
+        return True

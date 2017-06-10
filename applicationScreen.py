@@ -323,9 +323,21 @@ class App(QMainWindow):
         return tick
 
     def intro_complete(self):
-        self.intro_screen.create_subject_id_and_folder()
-        self.content = setup_study(self.intro_screen.subject_id)
-        self.data_result.subject_id = self.subject_id
+
+        if self.intro_screen.is_completed():
+            self.intro_screen.create_subject_id_and_folder()
+            self.content = setup_study(self.intro_screen.subject_id)
+            self.data_result.subject_id = self.subject_id
+        else:
+            self.enter_actions.append(self.intro_complete)
+
+    def survey_complete(self):
+        if self.questionnaire.is_completed():
+            self.record_survey_response()
+            if not self.data_result.is_base:
+                self.record_data_point()
+        else:
+            self.enter_actions.append(self.survey_complete)
 
     def set_trimed_audio_time(self):
         start = self.begin_slider.value()/float(self.AUDIO_TRIM)
@@ -486,13 +498,8 @@ class App(QMainWindow):
             self.questionnaire.show()
             self.footer.setText('Are you ready for the next one? Press ENTER to continue.')
             self.footer.show()
-
-            def survey_action():
-                self.record_survey_response()
-                if not self.data_result.is_base:
-                    self.record_data_point()
             
-            self.enter_actions.append(survey_action)
+            self.enter_actions.append(self.survey_complete)
                 
             
     def keyPressEvent(self, event):

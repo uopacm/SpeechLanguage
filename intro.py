@@ -168,6 +168,12 @@ class IntroScreen(QWidget):
             if btn.isChecked():
                 self.payload[2] = False
 
+    def is_completed(self):
+        s = self.stutters.checkedId() != -1
+        g = self.gender.checkedId() != -1
+        e = self.experimenter.checkedId() != -1
+        return s and g and e
+
 def run():
     app = QApplication(sys.argv)
     #GUI = IntroScreen()
