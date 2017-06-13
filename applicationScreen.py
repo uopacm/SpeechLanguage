@@ -486,6 +486,7 @@ class App(QMainWindow):
 
 
             def trim_audio_action():
+                self.playback_off()
                 self.set_trimed_audio_time()
                 self.record_data_point()
                 self.is_trimming = False

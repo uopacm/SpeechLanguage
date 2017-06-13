@@ -56,10 +56,10 @@ class AudioPlayback():
     def stop(self):
         if(self.is_playing):
             self.is_playing = False
-            self.stream.stop_stream()
-            self.stream.close()
-            self.play_thread.join()
-            self.audio_buffer = []
-
-    
-            
+            try :
+                self.play_thread.join()
+                self.stream.stop_stream()
+                self.stream.close()
+                self.audio_buffer = []
+            except:
+                print("Closing Audio Playback failed")
