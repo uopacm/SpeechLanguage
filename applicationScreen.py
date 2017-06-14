@@ -90,6 +90,8 @@ class App(QMainWindow):
         self.timer = QTimer()
         self.time_limit = 0.0
         self.base_recording_times = {}
+
+        self.timed_recording_count = 60
         
         # Have run() handle all methods
         self.run()
@@ -283,9 +285,7 @@ class App(QMainWindow):
     
     def recording_on(self):
         self.audio_recorder.start_recording(self.current_page.output_file)
-        self.title.setText("Recording on.")
-        self.title.show()
-        self.footer.setText('Press SPACE to stop recording')
+        self.footer.setText('Press SPACE when you\'ve completed the passage')
         self.footer.show()
 
     def recording_off(self):
@@ -444,7 +444,8 @@ class App(QMainWindow):
 
         elif(type(self.current_page) is TimedRecording):
             self.title.show()
-            self.title.setText('Press SPACE to begin recording')
+            self.title.setText(str(self.timed_recording_count))
+            self.timed_recording_count -= 1
             self.timed_text.setText(self.current_page.text)
             self.timed_text.pacman.value = 100
             self.showLabel(self.timed_text.scroll_text)
