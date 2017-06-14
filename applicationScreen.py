@@ -434,7 +434,7 @@ class App(QMainWindow):
             self.phrase.adjustSize()
             self.footer.setText('Press SPACE to begin recording')
             self.footer.show()
-            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-base.txt'
+            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-base.csv'
             self.record_passage_name(self.current_page.passage)
             self.data_result.is_base = True
 
@@ -452,12 +452,14 @@ class App(QMainWindow):
             self.timed_text.show()
             self.footer.setText('Press SPACE to begin recording')
             self.footer.show()
-            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-timed.txt'
+            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-timed.csv'
             self.data_result.is_base = False
             self.data_result.percentage = self.current_page.percentage
             
             base_time = self.base_recording_times[self.current_page.passage]
             record_time = (base_time * 1000) * self.current_page.percentage # Converting to miliseconds
+            if self.current_page.odd:
+                record_time += 1000
             self.timer.timeout.connect(self.timer_tick(record_time))
             print(str(record_time))
             self.timer.start(1) # Update the pacman every msec
