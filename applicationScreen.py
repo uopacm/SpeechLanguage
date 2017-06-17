@@ -94,6 +94,8 @@ class App(QMainWindow):
         self.timer = QTimer()
         self.time_limit = 0.0
         self.base_recording_times = {}
+
+        self.timed_recording_count = 60
         
         # Have run() handle all methods
         self.run()
@@ -320,9 +322,7 @@ class App(QMainWindow):
     
     def recording_on(self):
         self.audio_recorder.start_recording(self.current_page.output_file)
-        self.title.setText("Recording on.")
-        self.title.show()
-        self.footer.setText('Press SPACE to stop recording')
+        self.footer.setText('Press SPACE when you\'ve completed the passage')
         self.footer.show()
 
     def recording_off(self):
@@ -474,7 +474,7 @@ class App(QMainWindow):
             self.phrase.adjustSize()
             self.footer.setText('Press SPACE to begin recording')
             self.footer.show()
-            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-base.txt'
+            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-base.csv'
             self.record_passage_name(self.current_page.passage)
             self.data_result.is_base = True
 
@@ -484,19 +484,22 @@ class App(QMainWindow):
 
         elif(self.current_page.ptype == "TimedRecording"):
             self.title.show()
-            self.title.setText('Press SPACE to begin recording')
+            self.title.setText(str(self.timed_recording_count))
+            self.timed_recording_count -= 1
             self.timed_text.setText(self.current_page.text)
             self.timed_text.pacman.value = 100
             self.showLabel(self.timed_text.scroll_text)
             self.timed_text.show()
             self.footer.setText('Press SPACE to begin recording')
             self.footer.show()
-            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-timed.txt'
+            self.data_result.target_file = self.intro_screen.subject_id + '/' + self.intro_screen.subject_id + '-timed.csv'
             self.data_result.is_base = False
             self.data_result.percentage = self.current_page.percentage
             
             base_time = self.base_recording_times[self.current_page.passage]
             record_time = (base_time * 1000) * self.current_page.percentage # Converting to miliseconds
+            if self.current_page.odd:
+                record_time += 1000
             self.timer.timeout.connect(self.timer_tick(record_time))
             print(str(record_time))
             self.timer.start(1) # Update the pacman every msec
@@ -526,6 +529,7 @@ class App(QMainWindow):
 
 
             def trim_audio_action():
+                self.playback_off()
                 self.set_trimed_audio_time()
                 self.record_data_point()
                 self.is_trimming = False

@@ -35,6 +35,8 @@ class TrimAudio:
 class TimedRecording:
     def __init__(self, passage, subject, percentage, text):
         self.text = text
+        self.count = 0
+        self.odd = False
         self.passage = passage
         self.output_file = subject + '/' + subject + '-' + passage + "-" + str(percentage) + ".wav"
         self.percentage = percentage
@@ -84,11 +86,17 @@ def setup_study(subject):
         content.append(TextWindow("The Second Phase", "Thank you for your cooperation so far! In this last part, a passage will be presented and your recording time will begin immediately. Please read as much as you can until the timer by the sentence disappears. Sometimes the timer unravels slowly, other times it may unravel quickly. Just read whatever you can before the timer and reading disappears.\n\nPlease press the spacebar if you finish reading the passage before the timer fully unravels. You will read sentences that you have previously read before.\n\nAfter each sentence, you will be asked to respond to similar statements about your experience on a scale of 1 to 5 (similar to the first part of this experiement). Upon completion of the last rating, a new reading task will be offered.", "Ready to begin? Press RETURN to start your first reading."))
         
         timed = []
-        timed.extend(timed_passages(subject, text['twisters']))
         timed.extend(timed_passages(subject, text['anomalous']))
+
+        for group in timed:
+            for p in group:
+                p.odd = True
+            
+        timed.extend(timed_passages(subject, text['twisters']))
+
         random.shuffle(timed)
         timed = [page for section in timed for page in section]
-        
+
         content.extend(timed)
 
         content.append(TextWindow("", "Wow! You've made it through our entire experiment! Thank you so much for participating! If you have any questions, please ask the experimenter at this time.", ""))
