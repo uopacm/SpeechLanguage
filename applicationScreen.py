@@ -22,6 +22,7 @@ from questionnaire import Questionnaire
 
 import os.path
 from collections import namedtuple
+import jsonpickle
 
 WAV_IMAGE_HEIGHT = 490
 WAV_IMAGE_WIDTH = 832
@@ -266,25 +267,35 @@ class App(QMainWindow):
 
     def save (self):
         with open ("RECOVERY.txt", 'w') as f:
-            f.write (json.dumps (self.base_recording_times) + '\n'
-                     + json.dumps (self.current_page, cls=PageEncoder) + '\n'
-                     + json.dumps (self.content, cls=PageEncoder) + '\n')
+            f.write (jsonpickle.encode (self.base_recording_times) + '\n'
+                     + jsonpickle.encode (self.current_page) + '\n'
+                     + jsonpickle.encode (self.content) + '\n')
 
     def recover (self):
         with open ("RECOVERY.txt", 'r') as f:
+            print ('Recovering base times...')
             lines = f.readlines ()
-            self.base_recording_times = json.loads (lines [0])
-            self.current_page = {}
-            self.content = []
+            self.base_recording_times = jsonpickle.decode (lines [0])
+
+            # Load current page
+            print ('Recovering current page...')
+            self.content.append (jsonpickle.decode (lines [1]))
+
+            # Load rest of pages
+            print ('Recovering remaining pages...')
+            self.content.extend (jsonpickle.decode (lines [2]))
         
     def run(self):
 
         if os.path.isfile ("RECOVERY.txt"):
-                self.recover ()
+            print ('Recovery file detecting, restoring...')
+            self.recover ()
         else :
             self.content.extend(self.experiment_start)
-            
+
+       
         self.update_widget_layout()
+        
         # Get subject id
         # self.get_subect_info()
         self.next_page()
@@ -424,8 +435,10 @@ class App(QMainWindow):
         # Just hide everything so each page doesn't have
         # to worry about what was already being dispalyed
         self.hide_all()
-              
-        if(type(self.current_page) is Intro):
+
+        print(self.current_page.ptype)
+        
+        if(self.current_page.ptype == "Intro"):
             self.intro_screen.show()
             self.footer.setText('Press ENTER to continue')
             self.footer.show()
@@ -433,7 +446,7 @@ class App(QMainWindow):
             self.enter_actions.append(self.intro_complete)
         
         # ------ Setup a Text  Window Page --------
-        elif(type(self.current_page) is TextWindow):
+        elif(self.current_page.ptype == "TextWindow"):
             self.title.show()
             self.title.setText(self.current_page.header)
             self.title.adjustSize()
@@ -444,13 +457,13 @@ class App(QMainWindow):
             self.footer.setText(self.current_page.footer)
             self.footer.show()
 
-            if(self.title == 'THe Second Phase'):
+            if(self.title == 'The Second Phase'):
                 print(str(self.base_recording_times))
 
         # ------ Setup a Base Recording Page ---------
-        elif(type(self.current_page) is BaseRecording):
+        elif(self.current_page.ptype == "BaseRecording"):
             self.title.show()
-            self.title.setText('Press space to begin recording')
+            self.title.setText('Press SPACE to begin recording')
             self.scroll_area.show()
             self.phrase.show()
             self.phrase.setText(self.current_page.text)
@@ -465,7 +478,7 @@ class App(QMainWindow):
             self.spacebar_actions.append(self.recording_on)
             self.spacebar_actions.append(self.recording_off)
 
-        elif(type(self.current_page) is TimedRecording):
+        elif(self.current_page.ptype == "TimedRecording"):
             self.title.show()
             self.title.setText('Press SPACE to begin recording')
             self.timed_text.setText(self.current_page.text)
@@ -494,7 +507,7 @@ class App(QMainWindow):
             self.enter_actions.append(self.record_timed_data)
 
             
-        elif(type(self.current_page) is TrimAudio):
+        elif(self.current_page.ptype == "TrimAudio"):
             waveform.generatePng(self.current_page.wav_file)
             image = QPixmap(self.current_page.wav_file + '.png')
             self.begin_slider.show()
@@ -517,7 +530,7 @@ class App(QMainWindow):
             self.enter_actions.append(trim_audio_action)
 
 
-        elif(type(self.current_page) is Survey):
+        elif(self.current_page.ptype == "Survey"):
             self.questionnaire.show()
             self.footer.setText('Are you ready for the next one? Press ENTER to continue.')
             self.footer.show()
