@@ -1,6 +1,10 @@
 import json
 import random
 
+class PageEncoder (json.JSONEncoder):
+    def default (self, o):
+        return {type (o).__name__ : o.__dict__}
+
 # Used to hold the content for and indicate a text only window
 class Intro:
     def __init__(self):

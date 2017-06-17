@@ -20,6 +20,9 @@ from QRoundProgressBar import *
 from QTimedText import *
 from questionnaire import Questionnaire
 
+import os.path
+from collections import namedtuple
+
 WAV_IMAGE_HEIGHT = 490
 WAV_IMAGE_WIDTH = 832
 from intro import IntroScreen
@@ -78,7 +81,7 @@ class App(QMainWindow):
         # Holds a Queue of the different page contents
         self.experiment_start = [TextWindow(" ", "Reading Fluency with Time Pressure Study", "To begin study, please press RETURN"), Intro()]
         self.content = []
-        self.content.extend(self.experiment_start)
+        self.current_page = {}
 
         # Sequences the actions for the space bar
         self.spacebar_actions = []
@@ -260,8 +263,27 @@ class App(QMainWindow):
             qp = QPainter()
             qp.begin(self)
             qp.end()
+
+    def save (self):
+        with open ("RECOVERY.txt", 'w') as f:
+            f.write (json.dumps (self.base_recording_times) + '\n'
+                     + json.dumps (self.current_page, cls=PageEncoder) + '\n'
+                     + json.dumps (self.content, cls=PageEncoder) + '\n')
+
+    def recover (self):
+        with open ("RECOVERY.txt", 'r') as f:
+            lines = f.readlines ()
+            self.base_recording_times = json.loads (lines [0])
+            self.current_page = {}
+            self.content = []
         
     def run(self):
+
+        if os.path.isfile ("RECOVERY.txt"):
+                self.recover ()
+        else :
+            self.content.extend(self.experiment_start)
+            
         self.update_widget_layout()
         # Get subject id
         # self.get_subect_info()
@@ -394,6 +416,7 @@ class App(QMainWindow):
         self.spacebar_actions = []
         if(self.content):
             self.current_page = self.content.pop(0)
+            self.save ()
         else:
             # Restart experiment
             qApp.quit()
