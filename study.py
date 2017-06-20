@@ -1,16 +1,21 @@
 import json
 import random
 
+class PageEncoder (json.JSONEncoder):
+    def default (self, o):
+        return {type (o).__name__ : o.__dict__}
+
 # Used to hold the content for and indicate a text only window
 class Intro:
     def __init__(self):
-        pass
+        self.ptype = "Intro"
 
 class TextWindow:
     def __init__(self, header, text, footer):
         self.header = header
         self.text = text
         self.footer = footer
+        self.ptype = "TextWindow"
         
 # Used to hold the data for and indicate a base recording window
 class BaseRecording:
@@ -18,11 +23,13 @@ class BaseRecording:
         self.passage = passage
         self.text = text
         self.output_file = output_file + '.wav'
+        self.ptype = "BaseRecording"
 
 class TrimAudio:
     def __init__(self, passage, wav_file):
         self.passage = passage
         self.wav_file = wav_file
+        self.ptype = "TrimAudio"
         
 # Used to hold the data for and indicate a timed recording window
 class TimedRecording:
@@ -33,11 +40,13 @@ class TimedRecording:
         self.passage = passage
         self.output_file = subject + '/' + subject + '-' + passage + "-" + str(percentage) + ".wav"
         self.percentage = percentage
+        self.ptype = "TimedRecording"
 
 # Used to indicate a questionaire page
 class Survey:
     def __init__(self, output):
         self.output_file = output + '.txt'
+        self.ptype = "Survey"
 
 def add_passages(subject, content, text):
     for passage in text:
