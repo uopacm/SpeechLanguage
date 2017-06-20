@@ -202,7 +202,9 @@ class App(QMainWindow):
         self.show()
 
     def update_widget_layout(self):
-        self.intro_screen.move(self.width() * 0.35, self.height()/2)        
+        self.intro_screen.move(self.width() * 0.35, self.height()/2)
+        self.intro_screen.setFixedHeight(self.height() * 0.6)
+        self.intro_screen.setFixedWidth(self.width() * 0.6)
 
         self.scroll_area.setFixedHeight(self.height() * 0.6)
         self.scroll_area.setFixedWidth(self.width() * 0.7)
