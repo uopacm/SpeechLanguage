@@ -287,7 +287,7 @@ class App(QMainWindow):
     
     def recording_on(self):
         self.audio_recorder.start_recording(self.current_page.output_file)
-        self.header.setText('')
+        self.title.setText('')
         self.footer.setText('Press SPACE when you\'ve completed the passage')
         self.footer.show()
 
