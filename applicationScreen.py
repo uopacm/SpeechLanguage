@@ -273,6 +273,7 @@ class App(QMainWindow):
         with open ("RECOVERY.txt", 'w') as f:
             f.write (jsonpickle.encode (self.base_recording_times) + '\n'
                      + jsonpickle.encode (self.data_result) + '\n'
+                     + jsonpickle.encode (self.timed_recording_count) + '\n'
                      + jsonpickle.encode (self.current_page) + '\n'
                      + jsonpickle.encode (self.content) + '\n')
 
@@ -282,16 +283,19 @@ class App(QMainWindow):
             lines = f.readlines ()
             self.base_recording_times = jsonpickle.decode (lines [0])
 
-            print ('Recovering data result')
+            print ('Recovering data result...')
             self.data_result = jsonpickle.decode (lines [1])
+
+            print ('Recovering timed recording count...')
+            self.timed_recording_count = jsonpickle.decode(lines[2])
 
             # Load current page
             print ('Recovering current page...')
-            self.content.append (jsonpickle.decode (lines [2]))
+            self.content.append (jsonpickle.decode (lines [3]))
 
             # Load rest of pages
             print ('Recovering remaining pages...')
-            self.content.extend (jsonpickle.decode (lines [3]))
+            self.content.extend (jsonpickle.decode (lines [4]))
         
     def run(self):
 
