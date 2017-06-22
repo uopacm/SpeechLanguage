@@ -402,15 +402,20 @@ class App(QMainWindow):
             self.base_recording_times[self.current_page.passage] = result_time
             self.data_result.time = result_time
 
-    def record_timed_data(self):
-        if self.audio_recorder.is_recording:
-            self.enter_actions.append(self.record_timed_data)
-        else:
-            with contextlib.closing(wave.open(self.current_page.output_file, 'r')) as r:
-                frames = r.getnframes()
-                rate = r.getframerate()
-                duration = frames / float(rate)
-                self.data_result.time = duration
+    def record_timed_data(self, time_limit):
+        def f():
+            if self.audio_recorder.is_recording:
+                self.enter_actions.append(self.record_timed_data)
+            else:
+                with contextlib.closing(wave.open(self.current_page.output_file, 'r')) as r:
+                    frames = r.getnframes()
+                    rate = r.getframerate()
+                    duration = frames / float(rate)
+                    if duration > time_limit:
+                        self.data_result = time_limit
+                    else:
+                        self.data_result.time = duration
+        return f
     
     def record_passage_name(self, name):
         self.data_result.passage = name
@@ -520,7 +525,7 @@ class App(QMainWindow):
 
             # Spacebar actions for Base Recording
             self.spacebar_actions.append(self.recording_off)
-            self.enter_actions.append(self.record_timed_data)
+            self.enter_actions.append(self.record_timed_data(record_time))
 
             
         elif(self.current_page.ptype == "TrimAudio"):
