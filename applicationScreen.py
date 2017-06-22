@@ -3,7 +3,7 @@ import wave
 import contextlib
 from PyQt5 import QtGui
 
-from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider, QPushButton, QSpinBox
+from PyQt5.QtWidgets import QMessageBox, QMainWindow, QAction, qApp, QApplication, QLabel, QGridLayout, QScrollArea, QSlider, QPushButton, QSpinBox, QCheckBox
 from PyQt5.QtGui import QIcon, QPixmap, QPainter, QColor, QPen, QFont, QIntValidator
 from PyQt5.QtCore import *
 from PyQt5 import Qt
@@ -174,6 +174,8 @@ class App(QMainWindow):
 
         # Questionnaire
         self.questionnaire = Questionnaire(self)
+        self.questionnaire.setFixedWidth(self.width() * 0.5)
+        self.questionnaire.setFixedHeight(self.height() * 0.5)
         self.layout.addWidget(self.questionnaire)
 
         # Trim Audio Sliders
@@ -201,6 +203,9 @@ class App(QMainWindow):
         # Trim audio text dialogue
         self.trim_audio_entry = QSpinBox(self)
         self.layout.addWidget(self.trim_audio_entry)
+
+        self.trim_audio_completed = QCheckBox("Done Trimming", self)
+        self.layout.addWidget(self.trim_audio_completed)
         
         
         self.show()
@@ -232,6 +237,8 @@ class App(QMainWindow):
         self.trim_audio_begin_button.move(0, self.height() * 0.6)
         self.trim_audio_end_button.move(0, self.height() * 0.7)
         self.trim_audio_entry.move(0, self.height() * 0.8)
+
+        self.trim_audio_completed.move(0, self.height() * 0.9)
 
     def resizeEvent(self, event):
         self.update_widget_layout()
@@ -526,22 +533,26 @@ class App(QMainWindow):
             self.footer.setText('Press RETURN to continue')
             self.footer.show()
             self.is_trimming = True
+            self.trim_audio_completed.show()
             self.update()
 
-
             def trim_audio_action():
-                self.playback_off()
-                self.set_trimed_audio_time()
-                self.record_data_point()
-                self.is_trimming = False
-                self.update()
+                if self.trim_audio_completed.checkState() != 0:
+                    self.playback_off()
+                    self.set_trimed_audio_time()
+                    self.record_data_point()
+                    self.is_trimming = False
+                    self.update()
+                else:
+                    self.enter_actions.append(trim_audio_action)
                 
             self.enter_actions.append(trim_audio_action)
 
 
         elif(self.current_page.ptype == "Survey"):
             self.questionnaire.show()
-            self.title.setText(str(self.timed_recording_count))
+            if not self.data_result.is_base:
+                self.title.setText(str(self.timed_recording_count))
             self.title.show()
             self.footer.setText('Are you ready for the next one? Press ENTER to continue.')
             self.footer.show()

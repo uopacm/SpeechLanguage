@@ -7,7 +7,7 @@ class Questionnaire(QWidget):
     def __init__(self, parent):
         super(Questionnaire, self).__init__(parent)
         self.layout = QGridLayout()
-        self.setMinimumSize(QSize(500, 500))
+        self.setMinimumSize(QSize(parent.width() * 0.5, parent.height() * 0.5))
 
         # Add instructions at top
         self.instructions = QLabel("Rate the following statements for HOW MUCH you experienced: \n(1 being lowest, 5 being highest)", self)
