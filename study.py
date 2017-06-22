@@ -35,7 +35,6 @@ class TrimAudio:
 class TimedRecording:
     def __init__(self, passage, subject, percentage, text):
         self.text = text
-        self.count = 0
         self.odd = False
         self.passage = passage
         self.output_file = subject + '/' + subject + '-' + passage + "-" + str(percentage) + ".wav"
@@ -47,6 +46,7 @@ class Survey:
     def __init__(self, output):
         self.output_file = output + '.txt'
         self.ptype = "Survey"
+        self.count = 0
 
 def add_passages(subject, content, text):
     for passage in text:

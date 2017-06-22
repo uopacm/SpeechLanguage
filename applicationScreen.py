@@ -168,9 +168,9 @@ class App(QMainWindow):
 
         
         # Image for the wav form trimming
-#        self.wav_image = QLabel(self)
-#        self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
-#        self.layout.addWidget(self.wav_image)
+        self.wav_image = QLabel(self)
+        self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
+        self.layout.addWidget(self.wav_image)
 
         # Questionnaire
         self.questionnaire = Questionnaire(self)
@@ -356,7 +356,6 @@ class App(QMainWindow):
             interval = 100.0 / float(time_limit * 0.63)
             self.timed_text.pacman.setValue(self.timed_text.pacman.value - interval)
             if self.timed_text.pacman.value == 0:
-                self.recording_off()
                 self.timed_text.hide()
                 self.timer.stop()
                 self.timer = QTimer()
@@ -487,7 +486,6 @@ class App(QMainWindow):
 
         elif(self.current_page.ptype == "TimedRecording"):
             self.title.show()
-            self.title.setText(str(self.timed_recording_count))
             self.timed_recording_count -= 1
             self.timed_text.setText(self.current_page.text)
             self.timed_text.pacman.value = 100
@@ -501,10 +499,7 @@ class App(QMainWindow):
             
             base_time = self.base_recording_times[self.current_page.passage]
             record_time = (base_time * 1000) * self.current_page.percentage # Converting to miliseconds
-            if self.current_page.odd:
-                record_time += 1000
             self.timer.timeout.connect(self.timer_tick(record_time))
-            print(str(record_time))
             self.timer.start(1) # Update the pacman every msec
 
             self.recording_on()
@@ -518,6 +513,7 @@ class App(QMainWindow):
 
             
         elif(self.current_page.ptype == "TrimAudio"):
+            waveform.generatePng(self.current_page.wav_file)
             self.begin_slider.show()
             self.trim_audio_begin_button.show()
             self.end_slider.show()
@@ -541,6 +537,8 @@ class App(QMainWindow):
 
         elif(self.current_page.ptype == "Survey"):
             self.questionnaire.show()
+            self.title.setText(str(self.timed_recording_count))
+            self.title.show()
             self.footer.setText('Are you ready for the next one? Press ENTER to continue.')
             self.footer.show()
             
