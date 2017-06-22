@@ -168,9 +168,9 @@ class App(QMainWindow):
 
         
         # Image for the wav form trimming
-        self.wav_image = QLabel(self)
-        self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
-        self.layout.addWidget(self.wav_image)
+#        self.wav_image = QLabel(self)
+#        self.wav_image.resize(WAV_IMAGE_WIDTH,WAV_IMAGE_HEIGHT)
+#        self.layout.addWidget(self.wav_image)
 
         # Questionnaire
         self.questionnaire = Questionnaire(self)
@@ -222,7 +222,7 @@ class App(QMainWindow):
             (self.height() * 0.9) if (self.height() * 0.9 + self.footer.height() < self.height()) else (self.height() - self.footer.height())
         )
 
-        self.wav_image.move(self.width() * 0.100, 0)
+        #self.wav_image.move(self.width() * 0.150, 0)
         
         self.questionnaire.move(self.width()/4, self.height()/4)
         
@@ -246,7 +246,7 @@ class App(QMainWindow):
             qp.begin(self)
 
             # Draw Image
-            rect = QRect(self.width() * 0.085, 0, WAV_IMAGE_WIDTH, WAV_IMAGE_HEIGHT)
+            rect = QRect(self.width() * 0.125 - 44, 0, WAV_IMAGE_WIDTH, WAV_IMAGE_HEIGHT)
             qp.drawPixmap(rect, QPixmap(self.current_page.wav_file + '.png'))
 
             def slider_x(slider):
@@ -518,8 +518,6 @@ class App(QMainWindow):
 
             
         elif(self.current_page.ptype == "TrimAudio"):
-            waveform.generatePng(self.current_page.wav_file)
-            image = QPixmap(self.current_page.wav_file + '.png')
             self.begin_slider.show()
             self.trim_audio_begin_button.show()
             self.end_slider.show()
