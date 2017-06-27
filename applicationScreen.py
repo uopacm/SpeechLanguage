@@ -295,7 +295,7 @@ class App(QMainWindow):
 
             print ('Recovering timed recording count...')
             self.timed_recording_count = jsonpickle.decode(lines[2])
-
+            
             # Load current page
             print ('Recovering current page...')
             self.content.append (jsonpickle.decode (lines [3]))
@@ -405,14 +405,17 @@ class App(QMainWindow):
     def record_timed_data(self, time_limit):
         def f():
             if self.audio_recorder.is_recording:
-                self.enter_actions.append(self.record_timed_data)
+                self.enter_actions.append(self.record_timed_data(time_limit))
             else:
+                self.timed_text.hide()
+                self.timer.stop()
+                self.timer = QTimer()
                 with contextlib.closing(wave.open(self.current_page.output_file, 'r')) as r:
                     frames = r.getnframes()
                     rate = r.getframerate()
                     duration = frames / float(rate)
-                    if duration > time_limit:
-                        self.data_result = time_limit
+                    if duration > (time_limit * 0.001):
+                        self.data_result.time = (time_limit * 0.001)
                     else:
                         self.data_result.time = duration
         return f
@@ -538,6 +541,7 @@ class App(QMainWindow):
             self.footer.setText('Press RETURN to continue')
             self.footer.show()
             self.is_trimming = True
+            self.trim_audio_completed.setCheckState(False)
             self.trim_audio_completed.show()
             self.update()
 
