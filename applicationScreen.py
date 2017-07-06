@@ -495,7 +495,7 @@ class App(QMainWindow):
             self.phrase.adjustSize()
             self.footer.setText('Press SPACE to begin recording')
             self.footer.show()
-            self.data_result.target_file = self.subject_id + '/' + self.subject_id + '-base.csv'
+            self.data_result.target_file = self.current_page.output_file
             self.record_passage_name(self.current_page.passage)
             self.data_result.is_base = True
 
@@ -512,7 +512,7 @@ class App(QMainWindow):
             self.timed_text.show()
             self.footer.setText('Press SPACE to begin recording')
             self.footer.show()
-            self.data_result.target_file = self.subject_id + '/' + self.subject_id + '-timed.csv'
+            self.data_result.target_file = self.current_page.output_file
             self.data_result.is_base = False
             self.data_result.percentage = self.current_page.percentage
             

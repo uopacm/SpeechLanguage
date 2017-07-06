@@ -44,7 +44,7 @@ class TimedRecording:
 # Used to indicate a questionaire page
 class Survey:
     def __init__(self, output):
-        self.output_file = output + '.txt'
+        self.output_file = output + '.csv'
         self.ptype = "Survey"
         self.count = 0
 
