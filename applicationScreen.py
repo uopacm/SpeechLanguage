@@ -343,6 +343,7 @@ class App(QMainWindow):
         self.audio_recorder.stop_recording()
         self.title.setText("Recording off.")
         self.title.show()
+        self.timed_text.hide()
         self.footer.setText('Press RETURN to continue')
         self.footer.show()
 
